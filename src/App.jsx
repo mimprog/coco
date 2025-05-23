@@ -58,7 +58,7 @@ function App() {
   //console.log(isAdmin, isEditor);
   return (
    
-    <BrowserRouter>   
+    <HashRouter basename="/">   
       <Navbar/>
       <Routes>        
       {/**Public routes */}    
@@ -120,7 +120,7 @@ function App() {
           <Route element={<RequireEditor/>}>  
           </Route>
         </Routes>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
