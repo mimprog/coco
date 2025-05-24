@@ -86,7 +86,7 @@ const Home = () => {
           className="text-4xl md:text-6xl font-extrabold tracking-widest uppercase drop-shadow-2xl"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.7)" }}
         >
-          Audrey Cocoa Cameroon
+          Cocoa Cameroon
         </motion.h1>
       </header>
 
@@ -101,7 +101,7 @@ const Home = () => {
                 className="text-4xl font-bold mb-3 text-[#D9C4B2]"
                 style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.5)" }}
               >
-                Welcome, <span className="font-extrabold text-teal-900">Audrey Cocoa</span>
+                Welcome, <span className="font-extrabold text-teal-900">Cocoa Trace</span>
               </motion.h2>
               <p className="text-blue-900 text-lg leading-relaxed tracking-wide max-w-xl mx-auto">
                 Trusted platform for buying and selling cocoa beans and related products.
@@ -264,7 +264,7 @@ const Home = () => {
           )}
         </div>
         <p className="text-center text-sm mt-10 opacity-70 tracking-wide">
-          &copy; 2024 Audrey Cocoa Cameroon. All rights reserved.
+          &copy; 2025 Cocoa Trace Cameroon. All rights reserved.
         </p>
       </footer>
     </div>
