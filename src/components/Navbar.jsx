@@ -15,7 +15,7 @@ const IMAGE_URL = "/api/v1/upload/avatar";
 import axios from "./api/axios";
 import AudioLogo from "../assets/audiologo.png"
 import { selectCurrentUser } from "../slices/auth/authSlice";
-import logo from "../../dist/assets/logor.png";
+import logo from "../../src/assets/logor-Bqz5SyAo.png"
 const Navbar = () => {
   const [showModal, setShowModal] = useState(false);
   const [errMsg, setErrMsg] = useState("");
