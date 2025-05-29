@@ -12,7 +12,7 @@ const SERVER_URL = {
     LOGIN_URL: `${SU}/login`,
     USERS_URL : `${SU}/users/users`,
     PLOT_URL : `${SU}/plots/plots`,
-    SALE_URL : `${SU}/exporters/exporters`,
+    SALE_URL : `${SU}/sales/sales`,
     COOPERATIVE_URL: `${SU}/cooperatives/cooperatives`,
     EXPORTER_URL : `${SU}/exporters/exporters`,
     PURCHASE_URL : `${SU}/purchases/purchases`,

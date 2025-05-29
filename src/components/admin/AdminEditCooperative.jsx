@@ -1,73 +1,119 @@
-import queryString from "query-string"
-import {useState, useEffect, useRef} from "react";
+import queryString from "query-string";
+import { useState, useEffect } from "react";
 import axios from "../api/axios";
 import { COOPERATIVE_URL } from "../routes/serverRoutes";
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
+import { useNavigate } from "react-router-dom";
+
 const AdminEditCooperative = () => {
   const [name, setName] = useState("");
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
+  const [success, setSuccess] = useState("");
   const [id, setId] = useState("");
-
+  const navigate = useNavigate();
   const token = useSelector(selectCurrentToken);
-  useEffect(() => {
-    const {cooperativeId} = queryString.parse(location.search);
-    setId(cooperativeId);
-  }, [id])
 
-  console.log("name: ", name);
-
+  // ✅ Get cooperativeId from hash-based URL
   useEffect(() => {
-    const getRoom = async () => {
-        try {
-            const res = await axios.get(`${COOPERATIVE_URL}/${id}`, {headers: {withCredentials: true}});
-            console.log(res.data.name);
-            setName(res.data.name);
-        }catch(err) {
-            console.log(err?.response?.data?.error);
-        }
+    const hash = window.location.hash;
+    const query = hash.includes("?") ? hash.split("?")[1] : "";
+    const { cooperativeId } = queryString.parse(query);
+    if (cooperativeId) {
+      setId(cooperativeId);
     }
-    getRoom();
-  }, [id])
+  }, []);
 
+  // ✅ Fetch current cooperative details
+  useEffect(() => {
+    if (!id) return;
+    const getCooperative = async () => {
+      try {
+        const res = await axios.get(`${COOPERATIVE_URL}/${id}`, {
+          headers: { withCredentials: true },
+        });
+        setName(res.data.name);
+      } catch (err) {
+        console.log(err?.response?.data?.error);
+      }
+    };
+    getCooperative();
+  }, [id]);
 
+  // ✅ Edit cooperative and redirect after 2 seconds
   const EditCooperative = async (e) => {
     e.preventDefault();
-    
     try {
-        const editCooperative = await axios.put(`${COOPERATIVE_URL}/${id}`, {name:name},  { headers: {Authorization: `Bearer ${token}`,withCredentials: true, "Content-Type": "application/json"}});
-        if(editCooperative) {
-            setSuccess(`${name} has been edited successfully`);
-            setErrMsg("");
-            setTimeout(() => {
-              setSuccess("");
-            }, [3000])
+      const response = await axios.put(
+        `${COOPERATIVE_URL}/${id}`,
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            withCredentials: true,
+            "Content-Type": "application/json",
+          },
         }
-    }catch(err) {
-        console.log(err?.data?.message);
-        setErrMsg(err?.response?.data?.message);
-        setSuccess("");
+      );
+      if (response) {
+        setSuccess(`"${name}" updated successfully.`);
+        setErrMsg("");
+        setTimeout(() => {
+          navigate("/admin/cooperative");
+        }, 2000);
+      }
+    } catch (err) {
+      console.log(err);
+      setErrMsg(err?.response?.data?.message || "Failed to update cooperative.");
+      setSuccess("");
+      setTimeout(() => {
+        setErrMsg("");
+        navigate("/admin/cooperative");
+      }, 2000);
     }
-  }
+  };
 
   return (
-    <section className=" mx-1 py-1 md:mx-48 lg:mx-64">
-        <div className="text-center bg-amber-300 py-2 ">
-            <h1>Admin Edit Cooperative</h1>
-        </div>
-        <form className="py-2 mx-6" onSubmit={(e)=>EditCooperative(e)}>
-            {errMsg ? <div className="font-bold text-lg text-red-500"><h1>{errMsg}</h1></div> : null}
-            {success ? <div className="font-bold text-lg text-green-500"><h1>{success}</h1></div> : null}
-            <div className=" flex space-x-2 py-3">
-                <label className="mt-2 text-lg" htmlFor="name">Name </label>
-                <input value={name} onChange={e=>setName(e.target.value)} type="text" 
-                className="border text-lg p-2 text-blue-600" />
-            </div>
-            <button className=" ml-6 p-4 w-40 text-lg border shadow rounded-md bg-amber-200 hover:translate-y-1 hover:bg-amber-400" type="submit">Confirm </button>
-        </form>
-    </section>
-  )
-}
+    <section className="mx-2 py-4 md:mx-16 lg:mx-32 xl:mx-48">
+      <div className="text-center bg-amber-300 py-3 rounded-md shadow">
+        <h1 className="text-xl font-semibold text-gray-800">
+          Admin Edit Cooperative
+        </h1>
+      </div>
 
-export default AdminEditCooperative
+      <form className="py-6 px-4 bg-amber-100 mt-4 rounded-md shadow-md" onSubmit={EditCooperative}>
+        {errMsg && (
+          <div className="mb-4 text-center text-red-600 font-semibold">{errMsg}</div>
+        )}
+        {success && (
+          <div className="mb-4 text-center text-green-600 font-semibold">{success}</div>
+        )}
+
+        <div className="flex flex-col md:flex-row md:items-center mb-6">
+          <label className="mb-2 md:mb-0 md:mr-4 text-lg font-medium text-gray-800" htmlFor="name">
+            Name:
+          </label>
+          <input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            required
+            className="flex-1 px-4 py-2 border border-amber-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 text-gray-700"
+          />
+        </div>
+
+        <div className="text-center">
+          <button
+            type="submit"
+            className="w-40 py-2 text-lg font-semibold bg-amber-400 hover:bg-amber-500 text-white rounded-md shadow-md transition-transform duration-150 hover:-translate-y-0.5"
+          >
+            Confirm
+          </button>
+        </div>
+      </form>
+    </section>
+  );
+};
+
+export default AdminEditCooperative;

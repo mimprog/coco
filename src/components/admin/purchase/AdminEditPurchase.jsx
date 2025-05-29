@@ -35,12 +35,17 @@ const AdminEditPurchase = () => {
 
     const [idx, setIdx] = useState("");
 
-    useEffect(() => {
-      const {searchId} =  queryString.parse(location.search);
-      setIdx(searchId);
-      console.log(idx);
-    }, [idx])
 
+    useEffect(() => {
+  const hash = window.location.hash;
+  const query = hash.includes('?') ? hash.split('?')[1] : '';
+  const { purchaseId } = queryString.parse(query);
+  console.log("exporterId:", purchaseId);
+
+  if (purchaseId) {
+    setIdx(purchaseId);
+  }
+}, [idx]);
     useEffect(() => {
         const getSales = async () => {
             try {

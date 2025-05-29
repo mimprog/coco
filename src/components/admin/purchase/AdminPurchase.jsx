@@ -1,191 +1,177 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import { Link } from "react-router-dom";
-import { IoIosArrowDropup, IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useSelector } from "react-redux";
+import { formatDistanceToNow } from "date-fns";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
-import { FaPlus } from "react-icons/fa6";
 import { PURCHASE_URL } from "../../routes/serverRoutes";
+import TimeAgo from "react-timeago";
 const AdminPurchase = () => {
+  const [purchases, setPurchases] = useState([]);
+  const [filteredPurchases, setFilteredPurchases] = useState(null);
+  const [searchId, setSearchId] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
 
-  const salesJson = [
-    {userCode: "1", price: 123, quantity: 3, date: "Mon 4 20234"},
-    {userCode: "2", price: 9000, quantity: 3, date: "Mon 4 20234"},
-  ]
-    const [sales, setSales] = useState([]);
-    const [errMsg, setErrMsg] = useState("");
+  const token = useSelector(selectCurrentToken);
 
-    const [searchId, setSearchId] = useState("");
-
-    const [successMsg, setSuccessMsg] = useState("");
-    const [showMore, setShowMore]  = useState(false);
-
-    const [showplots, setShowplots] = useState([]);
-
-    const [usersCode, setUsersCode] = useState([]);
-    const [cooperativesId, setCooperativesId] = useState([]);
-
-    const [searchSales, setSearchSales] = useState(null);
-
-    const token = useSelector(selectCurrentToken);
-
-    useEffect(() => {
-        const getSales = async () => {
-            try {
-                const res = await axios.get(PURCHASE_URL, {headers:{Authorization: `Bearer ${token}`, withCredentials: true}});
-                console.log(res);
-                setSales(res.data);
-            }catch(err) {
-              console.log(err);
-                setErrMsg(err?.response?.data?.message);
-            }
-        }
-
-        getSales();
-
-    }, [])
-
-  const SearchPurchase = async (e, name) => {
-    console.log(name);
-    e.preventDefault();
-    try { 
-        const res = await axios.get(`${PURCHASE_URL}`, {headers: {Authorization: `Bearer ${token}`,withCredentials: true}});
-        console.log(res.data);
-        //setPlots(null);
-        setSearchSales(res?.data.filter(el => el.userCode.toLowerCase().includes(name.toLowerCase())));
-        console.log(searchSales);
-    }catch(err) {
-        console.log(err);
-        setErrMsg(err?.response?.data?.message);
-    }
-  }
-
-    const deleteSales = async (id) => {
-      console.log(id);
+  useEffect(() => {
+    const fetchPurchases = async () => {
       try {
-        const res = await axios.delete(`${PURCHASE_URL}/${id}`, {headers: {Authorization: `Bearer ${token}`, withCredentials: true}});
-        console.log(res.data);
-        setSales(sales.filter(sal => sal.id !==id));
-        if(res) {
-          setSuccessMsg("purchase has been deleted successfully");
-        }
-      }catch(err) {
-        setErrMsg(err?.response?.data?.message);
+        const res = await axios.get(PURCHASE_URL, {
+          headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+        });
+        setPurchases(res.data);
+      } catch (err) {
+        setErrMsg(err?.response?.data?.message || "Failed to fetch purchases.");
       }
+    };
+
+    fetchPurchases();
+  }, [token]);
+
+  const handleSearch = async (e, name) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+
+    try {
+      const res = await axios.get(PURCHASE_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          withCredentials: true,
+        },
+      });
+
+      const filtered = res.data.filter((purchase) =>
+        purchase.userCode.toLowerCase().includes(name.toLowerCase())
+      );
+      setFilteredPurchases(filtered);
+    } catch (err) {
+      setErrMsg(err?.response?.data?.message || "Search failed.");
     }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${PURCHASE_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+      });
+      setPurchases((prev) => prev.filter((p) => p.id !== id));
+      setFilteredPurchases((prev) => prev?.filter((p) => p.id !== id) || null);
+      setSuccessMsg("Purchase deleted successfully.");
+      setTimeout(() => setSuccessMsg(""), 3000);
+    } catch (err) {
+      setErrMsg(err?.response?.data?.message || "Failed to delete purchase.");
+      setTimeout(() => setErrMsg(""), 3000);
+    }
+  };
+
+  const displayList = filteredPurchases || purchases;
 
   return (
-    <>
-    <section className=" md:relative md:top-16 md:w-[90vw] mx-1 md:ml-[19%] xl:ml-[9%] mt-24">
-        <div className="my-1 md:w-[90vw]">
-            {/* <h1 className=" text-lg md:text-xl text-center bg-amber-200 font-semibold">Achats</h1> */}
-            <h1 className="border-l text-4xl md:text-[2.5rem]"><strong>Achats</strong></h1>
-        </div>
+    <section className="px-4 py-8 mt-24 max-w-7xl mx-auto">
+      <div className="mb-4 text-center md:text-left">
+        <h1 className="text-3xl font-bold text-amber-900">Purchase Management</h1>
+        {successMsg && (
+          <p className="mt-2 text-green-700 bg-green-100 p-2 rounded">{successMsg}</p>
+        )}
+        {errMsg && (
+          <p className="mt-2 text-red-700 bg-red-100 p-2 rounded">{errMsg}</p>
+        )}
+      </div>
 
-        {searchSales ? <h1 className="text-center font-bold py-3 text-amber-800 bg-amber-200">Achats trouves</h1> : null}
-        {/* <button className=" m-1 p-3 bg-amber-300 rounded-md" onClick={()=>setSearchSales(null)}>Tout afficher</button> */}
+      <div className="flex flex-col md:flex-row items-center gap-2 mb-6">
+        <input
+          type="text"
+          placeholder="Search by user code..."
+          className="flex-1 px-4 py-2 border rounded-md bg-amber-100 text-gray-900"
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch(e, searchId)}
+        />
+        <button
+          onClick={(e) => handleSearch(e, searchId)}
+          className="px-6 py-2 bg-amber-500 text-white rounded hover:bg-amber-600"
+        >
+          Search
+        </button>
+        {filteredPurchases && (
+          <button
+            onClick={() => {
+              setFilteredPurchases(null);
+              setSearchId("");
+            }}
+            className="px-4 py-2 text-sm text-amber-700 hover:underline"
+          >
+            Reset
+          </button>
+        )}
+      </div>
 
-        <div className="w-full md:w-[500px] m-auto flex">
-            <input 
-              onKeyDown={(e)=>(e.key === "Enter" ? SearchPurchase(e,searchId) : null)} 
-              placeholder="Rechercher..." className=" w-96 text-lg p-2 h-11 rounded  border px-4 text-black flex-1" 
-              type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-            <button 
-             onClick={(e) => SearchPurchase(e, searchId)} 
-             className="h-11 py-2 px-3 md:px-10 ml-1 text-lg bg-amber-300 rounded-md text-black hover:bg-blue-500 hover:translate-y-[1px] ">
-              Rechercher
-            </button>
-        </div>
+      <div className="mb-6 text-center">
+        <Link
+          to="/admin/purchase/add"
+          className="inline-block px-6 py-2 bg-amber-700 text-white rounded hover:bg-amber-800"
+        >
+          Add Purchase
+        </Link>
+      </div>
 
-        <div className="my-3 py-4 px-8 m-auto text-center">
-            <Link  to= "/admin/purchase/add"  className="w-11 h-4 p-2 border shadow rounded-lg bg-blue-100 hover:bg-blue-300 hover:translate-y-1" >
-              Ajouter achats
-            </Link>
-            {/* <a href="/admin/purchase/add" className="w-full h-full text-center"> Ajouter Achat </a>  */}
-        </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse bg-amber-50">
+          <thead className="bg-amber-200 text-amber-900 text-sm uppercase">
+            <tr>
+              <th className="px-4 py-3">User Code</th>
+              <th className="px-4 py-3">Cooperative ID</th>
+              <th className="px-4 py-3">Quantity</th>
+              <th className="px-4 py-3">Price</th>
+              <th className="px-4 py-3">Date</th>
+              <th className="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayList.length > 0 ? (
+              displayList.map((purchase) => (
+                <tr
+                  key={purchase.id}
+                  className="border-t border-amber-300 text-gray-800 hover:bg-amber-100"
+                >
+                  <td className="px-4 py-3">{purchase.userCode}</td>
+                  <td className="px-4 py-3">{purchase.cooperativeId}</td>
+                  <td className="px-4 py-3">{purchase.quantity}</td>
+                  <td className="px-4 py-3">{purchase.price}</td>
+<td className="p-2 text-sm text-gray-600">
+  <TimeAgo date={purchase.createdAt} />
+</td>
 
-        <div className="font-bold text-lg">
-            <h1 className="text-2xl"><b>Détails Achats</b></h1>
-        </div>
-
-
-        {searchSales ?
-        <div>
-          <table className="border-4 my-3 py-4 px-8 m-auto text-center">
-            <thead>
-              
-              <th>Code producteur</th>
-              <th>Cooperative</th>
-              <th>quantité</th>
-              <th>prix</th>
-              <th>date</th>
-            </thead>
-            <tbody>
-            {searchSales? searchSales.map((sale, i) => {
-              return (
-                <tr className="" key={sale.id}>
-                  <td>{sale.userCode}</td>
-                  <td>{sale.cooperativeId}</td>
-                  <td>{sale.quantity}</td>
-                  <td>{sale.price}</td>
-                  <td>D{sale.date}</td>    
-                  <div className=" flex mt-3">
-                      <button><Link onClick={e=> !sale.id ? e.preventDefault(): null}  to= {`/admin/purchase/edit?searchId=${sale.id}`}  
-                        className=" p-3 border shadow rounded-lg bg-green-200 hover:bg-green-400" >Edit</Link>
-                      </button>
-                      <button onClick={()=>deleteSales(sale.id)} 
-                        className=" ml-4 p-2 border shadow rounded-lg bg-red-200 hover:bg-red-400">Delete
-                      </button>
-                  </div>
-
+                  <td className="px-4 py-3 space-x-2">
+                    <Link
+                      to={`/admin/purchase/edit?purchaseId=${purchase.id}`}
+                      className="inline-block px-3 py-1 bg-green-200 text-green-900 rounded hover:bg-green-300"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(purchase.id)}
+                      className="inline-block px-3 py-1 bg-red-200 text-red-800 rounded hover:bg-red-400"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              )
-            }) : null}
-            </tbody>
-          </table>
-        </div>        
-        
-         : 
-         <div>
-          <table className="border-4 my-3 py-4 px-8 m-auto text-center">
-            <thead>
-              <th className="mx-2">Code producteur</th>
-              <th className="mx-2">Cooperative</th>
-              <th className="mx-2">quantité</th>
-              <th className="mx-2">prix</th>
-              <th className="mx-2">date</th>
-            </thead>
-            <tbody>
-            {sales? sales.map((sale, i) => {
-              return (
-                <tr className="" key={sale.id}>
-                  <td>{sale.userCode}</td>
-                  <td>{sale.cooperativeId}</td>
-                  <td>{sale.quantity}</td>
-                  <td>{sale.price}</td>
-                  <td>D{sale.date}</td>    
-                  <div className=" flex mt-3">
-                      <button><Link onClick={e=> !sale.id ? e.preventDefault(): null}  to= {`/admin/purchase/edit?searchId=${sale.id}`}  
-                        className=" p-3 border shadow rounded-lg bg-green-200 hover:bg-green-400" >Edit</Link>
-                      </button>
-                      <button onClick={()=>deleteSales(sale.id)} 
-                        className=" ml-4 p-2 border shadow rounded-lg bg-red-200 hover:bg-red-400">Delete
-                      </button>
-                  </div>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-600">
+                  No purchases found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};
 
-                </tr>
-              )
-            }) : null}
-            </tbody>
-          </table>
-        </div>        
-        }
-
-
-    </section> 
-    
-    </>
-  )
-}
-
-export default AdminPurchase
+export default AdminPurchase;

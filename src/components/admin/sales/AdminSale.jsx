@@ -1,187 +1,165 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import { Link } from "react-router-dom";
-import { IoIosArrowDropup, IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { SALE_URL } from "../../routes/serverRoutes";
+import TimeAgo from "react-timeago";
+
 const AdminSale = () => {
+  const [sales, setSales] = useState([]);
+  const [errMsg, setErrMsg] = useState("");
+  const [searchId, setSearchId] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [searchSales, setSearchSales] = useState(null);
 
-  const salesJson = [
-    {ExporterId: "1", price: 123, quantity: 3, date: "Mon 4 20234"},
-    {ExporterId: "2", price: 9000, quantity: 3, date: "Mon 4 20234"},
-  ]
-    const [sales, setSales] = useState([]);
-    const [errMsg, setErrMsg] = useState("");
+  const token = useSelector(selectCurrentToken);
 
-    const [searchId, setSearchId] = useState("");
 
-    const [successMsg, setSuccessMsg] = useState("");
-    const [showMore, setShowMore]  = useState(false);
-
-    const [showplots, setShowplots] = useState([]);
-
-    const [usersCode, setUsersCode] = useState([]);
-    const [cooperativesId, setCooperativesId] = useState([]);
-
-    const [searchSales, setSearchSales] = useState(null);
-
-    const token = useSelector(selectCurrentToken);
-
-    useEffect(() => {
-        const getSales = async () => {
-            try {
-                const res = await axios.get(SALE_URL, {headers:{Authorization: `Bearer ${token}`, withCredentials: true}});
-                console.log(res);
-                setSales(res.data);
-            }catch(err) {
-              console.log(err);
-                setErrMsg(err?.response?.data?.message);
-            }
-        }
-
-        getSales();
-
-    }, [])
-
-  const SearchSale = async (e, name) => {
-    console.log(name);
-    e.preventDefault();
-    try { 
-        const res = await axios.get(`${SALE_URL}`, {headers: {Authorization: `Bearer ${token}`,withCredentials: true}});
-        console.log(res.data);
-        //setPlots(null);
-        setSearchSales(res?.data.filter(el => el.exporterId.includes(name)));
-        console.log(searchSales);
-    }catch(err) {
-        console.log(err);
-        setErrMsg(err?.response?.data?.message);
-    }
-  }
-
-    const deleteSales = async (id) => {
-      console.log(id);
+  useEffect(() => {
+    const getSales = async () => {
       try {
-        const res = await axios.delete(`${SALE_URL}/${id}`, {headers: {Authorization: `Bearer ${token}`, withCredentials: true}});
-        console.log(res.data);
-        setSales(sales.filter(sal => sal.id !==id));
-        if(res) {
-          setSuccessMsg("purchase has been deleted successfully");
-        }
-      }catch(err) {
+        const res = await axios.get(SALE_URL, {
+          headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+        });
+        setSales(res.data);
+        console.log(res?.data);
+      } catch (err) {
         setErrMsg(err?.response?.data?.message);
       }
+    };
+
+    getSales();
+  }, []);
+
+  const searchSale = async (e, id) => {
+    e.preventDefault();
+    try {
+      const res = await axios.get(SALE_URL, {
+        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+      });
+      const filtered = res.data.filter((el) =>
+        el.exporterId.toString().includes(id)
+      );
+      setSearchSales(filtered);
+    } catch (err) {
+      setErrMsg(err?.response?.data?.message);
     }
+  };
+
+  const deleteSale = async (id) => {
+    try {
+      await axios.delete(`${SALE_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+      });
+      setSales(sales.filter((sale) => sale.id !== id));
+      setSuccessMsg("Sale deleted successfully.");
+      setTimeout(() => setSuccessMsg(""), 2000);
+    } catch (err) {
+      setErrMsg(err?.response?.data?.message);
+    }
+  };
+
+  const displayedSales = searchSales ?? sales;
 
   return (
-    <>
-    <section className=" md:absolute md:top-16 md:w-[90vw] mx-1 md:ml-[19%] xl:ml-[9%]">
-        <div className="my-1 md:w-[90vw]">
-            <h1 className=" text-lg md:text-xl text-center bg-amber-200 font-semibold">Admin Sale DashBoard</h1>
-        </div>
+    <section className="p-4 md:ml-[19%] xl:ml-[10%] md:mt-16">
+      <div className="text-center bg-amber-200 py-3 rounded-md shadow mb-4">
+        <h1 className="text-xl font-semibold text-gray-800">Admin Sales Dashboard</h1>
+      </div>
 
-        {searchSales ? <h1 className="text-center font-bold py-3 text-amber-600 bg-amber-200">ventes trouves</h1> : null}
-        <button className=" m-1 p-3 bg-amber-300 rounded-md" onClick={()=>setSearchSales(null)}>All ventes</button>
+      {errMsg && (
+        <div className="text-red-600 font-semibold text-center mb-2">{errMsg}</div>
+      )}
+      {successMsg && (
+        <div className="text-green-600 font-semibold text-center mb-2">{successMsg}</div>
+      )}
 
-        <div className="md:w-[100%]">
-            <input 
-              onKeyDown={(e)=>(e.key === "Enter" ? SearchSale(e,searchId) : null)} 
-              placeholder="search..." className=" w-96 text-lg p-2 h-11 bg-amber-200 text-gray-700" 
-              type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-            <button 
-             onClick={(e) => SearchSale(e, searchId)} 
-             className="h-11 py-2 px-3 md:px-10 ml-1 text-lg bg-amber-300 rounded-md text-gray-700 hover:bg-blue-500 hover:translate-y-[1px] ">
-              Search
-            </button>
-        </div>
+      {searchSales && (
+        <h2 className="text-center text-amber-700 bg-amber-100 py-2 mb-2 font-medium">
+          Filtered Sales Results
+        </h2>
+      )}
 
-        <div className="my-3">
-            <Link  to= "/admin/sale/add"  className=" w-11 h-4 p-2 border shadow rounded-lg bg-blue-100 hover:bg-blue-300 hover:translate-y-1" >Ajouter ventes</Link>
-        </div>
+      <div className="flex flex-wrap items-center mb-4 gap-2">
+        <input
+          onKeyDown={(e) => e.key === "Enter" && searchSale(e, searchId)}
+          placeholder="Search by Exporter ID..."
+          className="w-full md:w-96 p-2 text-lg bg-amber-100 border rounded-md text-gray-700"
+          type="text"
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+        />
+        <button
+          onClick={(e) => searchSale(e, searchId)}
+          className="px-4 py-2 bg-amber-300 hover:bg-amber-400 text-gray-800 font-medium rounded-md transition"
+        >
+          Search
+        </button>
+        <button
+          onClick={() => setSearchSales(null)}
+          className="px-4 py-2 bg-amber-200 hover:bg-amber-300 text-gray-700 font-medium rounded-md"
+        >
+          Reset
+        </button>
+        <Link
+          to="/admin/sale/add"
+          className="ml-auto px-4 py-2 bg-blue-200 hover:bg-blue-300 text-blue-900 font-semibold rounded-md shadow"
+        >
+          Add Sale
+        </Link>
+      </div>
 
-        <div className="font-bold text-lg ">
-            <h1>Ventes Info</h1>
-        </div>
+      <div className="overflow-x-auto">
+        <table className="w-full border border-amber-300 rounded-md text-left">
+          <thead className="bg-amber-100 text-amber-800 font-medium">
+            <tr>
+              <th className="p-2">Exporter ID</th>
+              <th className="p-2">Cooperative ID</th>
+              <th className="p-2">Quantity</th>
+              <th className="p-2">Price</th>
+              <th className="p-2">Date</th>
+              <th className="p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayedSales.length === 0 && (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-600">
+                  No sales found.
+                </td>
+              </tr>
+            )}
+            {displayedSales.map((sale) => (
+              <tr key={sale.id} className="border-t border-amber-200">
+                <td className="p-2">{sale.exporterId}</td>
+                <td className="p-2">{sale.cooperativeId}</td>
+                <td className="p-2">{sale.quantity}</td>
+                <td className="p-2">{sale.price}</td>
+                <td className="p-2 text-sm text-gray-600">
+                  <TimeAgo date={sale.createdAt} />
+                </td>
+                <td className="p-2 flex flex-wrap gap-2">
+                  <Link
+                    to={`/admin/sale/edit?saleId=${sale.id}`}
+                    className="px-3 py-1 bg-green-200 hover:bg-green-400 text-green-800 rounded-md"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    onClick={() => deleteSale(sale.id)}
+                    className="px-3 py-1 bg-red-200 hover:bg-red-400 text-red-800 rounded-md"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+};
 
-
-        {searchSales ?
-        <div>
-          <table className=" border-4">
-            <thead>
-              
-              <th>Exporter Id</th>
-              <th>Cooperative Id</th>
-              <th>quantity</th>
-              <th>price</th>
-              <th>date</th>
-            </thead>
-            <tbody>
-            {searchSales? searchSales.map((sale, i) => {
-              return (
-                <tr className="" key={sale.id}>
-                  <td>{sale.exporterId}</td>
-                  <td>{sale.cooperativeId}</td>
-                  <td>{sale.quantity}</td>
-                  <td>{sale.price}</td>
-                  <td>D{sale.date}</td>    
-                  <div className=" flex mt-3">
-                      <button><Link onClick={e=> !sale.id ? e.preventDefault(): null}  to= {`/admin/sale/edit?searchId=${sale.id}`}  
-                        className=" p-3 border shadow rounded-lg bg-green-200 hover:bg-green-400" >Edit</Link>
-                      </button>
-                      <button onClick={()=>deleteSales(sale.id)} 
-                        className=" ml-4 p-2 border shadow rounded-lg bg-red-200 hover:bg-red-400">Delete
-                      </button>
-                  </div>
-
-                </tr>
-              )
-            }) : null}
-            </tbody>
-          </table>
-        </div>        
-        
-         : 
-        <div>
-          <table className=" border-4">
-            <thead>
-              
-              <th>Exporter Id</th>
-              <th>Cooperative Id</th>
-              <th>quantity</th>
-              <th>price</th>
-              <th>date</th>
-            </thead>
-            <tbody>
-            {sales? sales.map((sale, i) => {
-              return (
-                <tr className="" key={sale.id}>
-                  <td>{sale.exporterId}</td>
-                  <td>{sale.cooperativeId}</td>
-                  <td>{sale.quantity}</td>
-                  <td>{sale.price}</td>
-                  <td>D{sale.date}</td>    
-                  <div className=" flex mt-3">
-                      <button><Link onClick={e=> !sale.id ? e.preventDefault(): null}  to= {`/admin/sale/edit?searchId=${sale.id}`}  
-                        className=" p-3 border shadow rounded-lg bg-green-200 hover:bg-green-400" >Edit</Link>
-                      </button>
-                      <button onClick={()=>deleteSales(sale.id)} 
-                        className=" ml-4 p-2 border shadow rounded-lg bg-red-200 hover:bg-red-400">Delete
-                      </button>
-                  </div>
-
-                </tr>
-              )
-            }) : null}
-            </tbody>
-          </table>
-        </div>        
-        }
-
-
-    </section> 
-    
-    </>
-  )
-}
-
-export default AdminSale
+export default AdminSale;

@@ -34,13 +34,17 @@ const AdminEditSale = () => {
 
     const [idx, setIdx] = useState("");
 
+
     useEffect(() => {
-      const {searchId} =  queryString.parse(location.search);
-      setIdx(searchId);
-      console.log(idx);
-      console.log("searchId :" + searchId);
-    }, [idx])
-    
+  const hash = window.location.hash;
+  const query = hash.includes('?') ? hash.split('?')[1] : '';
+  const { saleId } = queryString.parse(query);
+  console.log("exporterId:", saleId);
+
+  if (saleId) {
+    setIdx(saleId);
+  }
+}, [idx]);
 
     useEffect(() => {
         const getSales = async () => {
@@ -132,7 +136,7 @@ const AdminEditSale = () => {
     <section className=" md:ml-[21%] md:w-[55vw] bg-gradient-to-r from-amber-200 to-amber-300 md:bg-zinc-200
         px-1">
       <div className=" my-2 mt-1 bg-gradient-to-l from-amber-400 ">
-        <h1 className="text-2xl text-center ">Admin Purchase DashBoard</h1>
+        <h1 className="text-2xl text-center ">Admin Edit Sale </h1>
       </div>
 
         {errMsg? <div className=" animate-bounce font-bold text-lg text-red-500"><h1>{errMsg}</h1></div> : null}

@@ -1,162 +1,170 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
-import { COOPERATIVE_URL, USERS_URL, PLOT_URL } from "../routes/serverRoutes";
+import { COOPERATIVE_URL } from "../routes/serverRoutes";
 import { useSelector } from "react-redux";
+
 const AdminCooperative = () => {
-  const [name, setName] = useState("");
-  const [cooperatives, setCooperatives] = useState([]);
   const [searchId, setSearchId] = useState("");
-  const [errMsg, setErrMsg] = useState("");
+  const [cooperatives, setCooperatives] = useState([]);
   const [searchCooperatives, setSearchCooperatives] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
   const token = useSelector(selectCurrentToken);
+
   useEffect(() => {
-    const getCooperativeData = async () => {
-        try {
-            const res = await axios.get(COOPERATIVE_URL, {headers: {Authorization: `Bearer ${token}`, withCredentials: true}});
-            console.log(res?.data);
-            setCooperatives(res?.data);
-        }catch(err) {
-            console.log(err);
-        }
-    }
-    getCooperativeData();
-  }, [])
+    const fetchCooperatives = async () => {
+      try {
+        const res = await axios.get(COOPERATIVE_URL, {
+          headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+        });
+        setCooperatives(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchCooperatives();
+  }, []);
 
-  const searchCooperative = async (e, name) => {
+  const handleSearch = async (e, name) => {
     e.preventDefault();
-    try { 
-        const res = await axios.get(`${COOPERATIVE_URL}`, {headers: {Authorization: `Bearer ${token}`,withCredentials: true, "Content-Type": "application/json"}});
-        setSearchCooperatives(res?.data.filter(el => el.name.toLowerCase().includes(name.toLowerCase())));
-    }catch(err) {
-        console.log(err?.data?.message);
-        setErrMsg(err?.data?.message);
-    }
-  }
-
-  console.log(searchCooperatives)
-
-  const deleteCooperative = async (cooperativeId) => {    
     try {
-        await axios.delete(`${COOPERATIVE_URL}/${cooperativeId}`, {headers: {Authorization: `Bearer ${token}`,withCredentials: true}});
-        setCooperatives(cooperatives.filter(cooperative => cooperative.id !== cooperativeId));
-    }catch(err) {
-        console.log(err);
+      const res = await axios.get(COOPERATIVE_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          withCredentials: true,
+          "Content-Type": "application/json",
+        },
+      });
+      const filtered = res.data.filter((el) =>
+        el.name.toLowerCase().includes(name.toLowerCase())
+      );
+      setSearchCooperatives(filtered);
+    } catch (err) {
+      console.error(err?.response?.data?.message);
+      setErrMsg(err?.response?.data?.message);
     }
-  }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${COOPERATIVE_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+      });
+      setCooperatives((prev) => prev.filter((co) => co.id !== id));
+      if (searchCooperatives) {
+        setSearchCooperatives((prev) => prev.filter((co) => co.id !== id));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const cooperativesToDisplay = searchCooperatives || cooperatives;
 
   return (
-    <>
-    { searchCooperatives ?
+    <section className="w-[90vw] max-w-6xl mx-auto mt-24 px-2">
+      <div className="bg-amber-100 p-4 rounded-lg shadow-md mb-4 text-center">
+        <h1 className="text-2xl font-bold text-yellow-900">
+          {searchCooperatives ? "Résultat de la recherche" : "Gestion des Coopératives"}
+        </h1>
+        {searchCooperatives && (
+          <button
+            className="mt-2 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+            onClick={() => setSearchCooperatives(null)}
+          >
+            Voir toutes les coopératives
+          </button>
+        )}
+      </div>
 
-    <section className=" w-[80vw] md:absolute md:left-1/2 md:-translate-x-1/2 mt-28">
-        <h1 className="text-center font-bold py-3 text-blue-600 bg-amber-200">Cooperative trouve</h1>
-        <button className=" m-1 p-3 bg-amber-300 rounded-md" onClick={()=>setSearchCooperatives(null)}>All Cooperative</button>
-        <div className="mx-1">
-            <input onKeyDown={(e)=>(e.key === "Enter" ? searchCooperative(e,searchId) : null)} placeholder="name" className="w-96 text-lg p-2 h-11 bg-amber-200 text-gray-700" type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-            <button  onClick={(e) => searchCooperative(e, searchId)} className="h-11 w-20 p-2 ml-1 text-lg bg-amber-300 rounded-md text-gray-700 hover:bg-amber-500 hover:translate-y-[1px] ">Search</button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+        <div className="flex gap-2 flex-1">
+          <input
+            type="text"
+            placeholder="Rechercher par nom..."
+            value={searchId}
+            onChange={(e) => setSearchId(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch(e, searchId)}
+            className="flex-1 p-2 border border-yellow-400 rounded-md focus:ring-2 focus:ring-yellow-600"
+          />
+          <button
+            onClick={(e) => handleSearch(e, searchId)}
+            className="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-800"
+          >
+            Rechercher
+          </button>
         </div>
+        <Link
+          to="/admin/cooperative/add"
+          className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 shadow"
+        >
+          Ajouter une coopérative
+        </Link>
+      </div>
 
-        <div className="my-3">
-            <Link  to= "/admin/cooperative/add"  className=" w-11 h-4 p-2 border shadow rounded-lg bg-amber-500" >Ajouter un cooperative</Link>
-        </div>
-        <ul className="md:hidden">
-            {searchCooperatives.map(cooperative => {
-                return (
-                    <div key={cooperative.id} className="border-b-2 text-[17px] font-medium py-3">
-                        <p className="flex text-gray-800">Name: <p className="ml-2 text-blue-900">{cooperative.name}</p></p>
-                        <div className="mt-3">
-                            <button ><Link  to= {`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}  className=" p-3 border shadow rounded-lg bg-green-300" >Modifier</Link> </button>
-                            <button onClick={()=>deleteCooperative(cooperative.id)} className=" ml-4 p-3 border shadow rounded-lg bg-red-400" >Supprimer</button>
-                        </div>                        
-                    </div>
-                )
-            })}          
-        </ul>
-        <table className=" mx-1 overflow-hidden hidden md:inline  bg-zinc-100 my-3">
-            <thead className=" flex border-b-2 border-amber-200">
-                <tr className=" mx-1 flex space-x-40">
-                    <th>Nom</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody className="">
-             {searchCooperatives.map(cooperative=> {
-                return (
-               
-                <tr key={cooperative._id} className=" mx-1 flex space-x-28 my-2 mb-6 border-b-2 ">
-                    <td>{cooperative.name}</td>
-                    <td><Link  to= {`/admin/room/edit?cooperativeId=${cooperative.id}`}  className=" w-6 h-2 p-2 border shadow rounded-lg bg-green-300" >Modifier</Link> </td>
-                    <button onClick={()=>deleteCooperative(cooperative.id)} className=" ml-4 p-3 border shadow rounded-lg bg-red-400" >Supprimer</button>              
-                </tr>
-                )
-             })}
-            </tbody>
-        </table>    
+      <div className="text-center text-red-600 font-semibold mb-2">{errMsg}</div>
+
+      {/* Mobile List */}
+      <ul className="md:hidden space-y-4">
+        {cooperativesToDisplay.map((cooperative) => (
+          <li
+            key={cooperative.id}
+            className="p-4 bg-amber-50 rounded-lg shadow border border-yellow-300"
+          >
+            <p className="text-lg font-medium text-yellow-900">
+              Nom: <span className="text-brown-700">{cooperative.name}</span>
+            </p>
+            <div className="mt-3 flex gap-2">
+              <Link
+                to={`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}
+                className="flex-1 text-center bg-green-500 text-white py-2 rounded hover:bg-green-600"
+              >
+                Modifier
+              </Link>
+              <button
+                onClick={() => handleDelete(cooperative.id)}
+                className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
+              >
+                Supprimer
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      {/* Desktop Table */}
+      <table className="hidden md:table w-full mt-6 bg-amber-50 border rounded-lg overflow-hidden">
+        <thead className="bg-yellow-200 text-yellow-900">
+          <tr>
+            <th className="text-left py-3 px-4">Nom</th>
+            <th className="text-left py-3 px-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cooperativesToDisplay.map((cooperative) => (
+            <tr key={cooperative.id} className="border-t">
+              <td className="py-3 px-4">{cooperative.name}</td>
+              <td className="py-3 px-4 flex gap-2">
+                <Link
+                  to={`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}
+                  className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Modifier
+                </Link>
+                <button
+                  onClick={() => handleDelete(cooperative.id)}
+                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </section>
-    :
-    <section className="mx-1 w-[80vw] md:absolute md:left-1/2 md:-translate-x-1/2 mt-28">
-        <div className="my-1 md:w-[50%]">
-            <h1 className=" text-lg md:text-xl text-center bg-amber-200 font-semibold">Admin Cooperative Management*</h1>
-        </div>
+  );
+};
 
-        <div>
-            <input onKeyDown={(e)=>(e.key === "Enter" ? searchCooperative(e,searchId) : null)} 
-                placeholder="nom" className="w-96 text-lg p-2 h-11 bg-amber-200 text-gray-700" 
-                type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-            <button  
-                onClick={(e) => searchCooperative(e, searchId)} className="h-11 p-2 ml-1 text-lg bg-amber-300 rounded-md text-gray-700 hover:bg-amber-500 hover:translate-y-[1px] ">
-                    Search</button>
-        </div>
-
-        <div className="my-3">
-            <Link  to= "/admin/cooperative/add"  className=" w-11 h-4 p-2 border shadow rounded-lg bg-amber-500" >Ajouter une cooperative</Link>
-        </div>
-
-        <div className="font-bold text-lg ">
-            <h1>Cooperative Info</h1>
-        </div>
-
-        <ul className="md:hidden">
-            {cooperatives.map(cooperative => {
-                return (
-                    <div key={cooperative.id} className="border-b-2 text-[17px] font-medium py-2">
-                        <p className="flex text-gray-800">Name: <p className="ml-2 text-blue-900">{cooperative.name}</p></p>
-                        <div className="mt-3">
-                            <button className="  w-20 p-2 border shadow rounded-lg bg-green-200 hover:bg-green-400 hover:-translate-y-[2px] focus:ring-2 focus:ring-green-400">
-                                <Link  to= {`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}  >Modifier</Link> </button>
-                            <button className="  w-20 ml-4 p-2 border shadow rounded-lg bg-red-300 hover:bg-red-500 hover:-translate-y-[2px] focus:ring-2 focus:ring-red-400" 
-                                onClick={()=>deleteCooperative(cooperative.id)}  >Supprimer</button>
-                        </div>                        
-                    </div>
-                )
-            })}          
-        </ul>
-        <table className="overflow-hidden hidden md:inline  bg-amber-100 my-3">
-            <thead className=" flex border-b-2 border-blue-200">
-                <tr className=" mx-3 flex space-x-40">
-                    <th>Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody className="">
-             {cooperatives.map(cooperative=> {
-                return (
-    
-                <tr key={cooperative.id} className=" w-screen mx-3 flex my-2 mb-6 border-b-2 ">
-                    <td className="">{cooperative.name}</td>         
-                    <td><Link  to= {`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}  className=" w-6 h-2 p-2 border shadow rounded-lg bg-green-300" >Modifier</Link> </td>
-                    <button onClick={()=>deleteCooperative(cooperative.id)} className=" ml-2 p-2 border shadow rounded-lg bg-red-400" >Supprimer</button>              
-                </tr>
-                )
-             })}
-            </tbody>
-        </table>
-
-    </section> }
-    </>
-  )
-}
-
-export default AdminCooperative
+export default AdminCooperative;

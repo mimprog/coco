@@ -114,7 +114,7 @@ const AdminAddPurchase = () => {
           {usersCode ? usersCode.map(user => {
             return (
               <option key={user.id}>
-                {user.code} {user.username}
+                {user.code}
               </option>
             )
           }) : null}

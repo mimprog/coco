@@ -1,192 +1,207 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { selectCurrentToken } from "../../slices/auth/authSlice";
 import { useSelector } from "react-redux";
+import { selectCurrentToken } from "../../slices/auth/authSlice";
 import axios from "../api/axios";
 import { USERS_URL } from "../routes/serverRoutes";
+
+/*
+ * AdminUser – CRUD dashboard for managing users
+ * ------------------------------------------------
+ * – Brown‑toned (amber + stone) palette
+ * – Mobile‑first, fully responsive
+ * – Accessible colour contrast & focus rings
+ */
+
 const AdminUser = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [avatar, setAvatar] = useState("");
-  const [password, setPasswrd] = useState("");
+  // ────────────────────────────────── state
   const [users, setUsers] = useState([]);
   const [searchId, setSearchId] = useState("");
-  const [errMsg, setErrMsg] = useState("");
-  const [searchUsers, setSearchUsers] = useState(null);
+  const [filtered, setFiltered] = useState(null); // null → show all
+  const [error, setError] = useState("");
+
   const token = useSelector(selectCurrentToken);
 
+  // ────────────────────────────────── helpers
+  const headers = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    withCredentials: true,
+  };
+
+  const fetchUsers = useCallback(async () => {
+    try {
+      const { data } = await axios.get(USERS_URL, headers);
+      setUsers(data);
+      setError("");
+    } catch (err) {
+      setError(err?.response?.data?.message || "Unable to retrieve users");
+    }
+  }, [token]);
+
   useEffect(() => {
-    const getUserData = async () => {
-        try {
-            const res = await axios.get(USERS_URL, {headers: {Authorization: `Bearer ${token}`,withCredentials: true, 
-               }});
-            console.log(res?.data);
-            setUsers(res?.data);
-            console.log(users);
-        }catch(error) {
-            setErrMsg(error?.response?.data?.message);
-            console.log("error: ", error?.data);
-        }
-    }
-    getUserData();
-  }, [])
+    fetchUsers();
+  }, [fetchUsers]);
 
-  const searchUser = async (e, code) => {
-    e.preventDefault();
+  // ────────────────────────────────── actions
+  const handleSearch = async (e) => {
+    e?.preventDefault();
+    if (!searchId.trim()) return setFiltered(null);
+
     try {
-        const searchuser = await axios.get(`${USERS_URL}/${code}`, {Authorization: `Bearer ${token}`,headers: {withCredentials: true}});
-        console.log(searchuser.data);
-        setSearchUsers(searchuser.data.users);
-    }catch(err) {
-        console.log(err?.data?.message);
-        setErrMsg(err?.data?.message);
+      const { data } = await axios.get(`${USERS_URL}/${searchId.trim()}`, headers);
+      setFiltered(data.users);
+      setError("");
+    } catch (err) {
+      setFiltered(null);
+      setError(err?.response?.data?.message || "User not found");
     }
-  }
+  };
 
-
-  const deleteUser = async (code) => {  
-    console.log(code);  
+  const deleteUser = async (code) => {
+    if (!window.confirm("Delete this user?")) return;
     try {
-        await axios.delete(`${USERS_URL}/${code}`, {Authorization: `Bearer ${token}`,headers: {withCredentials: true}});
-        setUsers(users.filter(user => user.code !== code));
-    }catch(err) {
-        console.log(err);
+      await axios.delete(`${USERS_URL}/${code}`, headers);
+      setUsers((prev) => prev.filter((u) => u.code !== code));
+      // also purge from filtered list if needed
+      setFiltered((prev) => (Array.isArray(prev) ? prev.filter((u) => u.code !== code) : prev));
+    } catch (err) {
+      setError("Failed to delete user");
     }
-  }
+  };
 
+  // decide which collection to render
+  const collection = filtered ?? users;
+
+  // ────────────────────────────────── render
   return (
-    <div>
-    { searchUsers ?
+    <div className="container mx-auto px-4 pt-28 font-sans text-stone-800">
+      {/* heading */}
+      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-2xl sm:text-3xl font-bold text-amber-800">User Management Dashboard</h1>
 
-    <section className=" mt-28">
-        <h1 className="text-center font-bold py-3 text-blue-600 bg-indigo-200">User found</h1>
-        <button className="p-3 bg-indigo-300 rounded-md" onClick={()=>setSearchUsers(null)}>All Users</button>
-        <div className="mx-1">
-            <input onKeyDown={(e)=>(e.key === "Enter" ? searchUser(e,searchId) : null)} placeholder="search..." className="w-96 text-lg p-2 h-11 bg-indigo-200 text-gray-700" type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-            <button  onClick={(e) => searchUser(e, searchId)} className="h-11 w-20 p-2 ml-1 text-lg bg-blue-300 rounded-md text-gray-700 hover:bg-blue-500 hover:translate-y-[1px] ">Search</button>
-        </div>
+        <Link
+          to="/admin/user/add"
+          className="inline-block rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+        >
+          Add User
+        </Link>
+      </header>
 
-        <div className="my-3">
-            <Link  to= "/admin/user/add"  className=" w-11 h-4 p-2 border shadow rounded-lg bg-blue-500" >Add a User</Link>
-        </div>
-        <ul className="md:hidden">
-            {searchUsers.map(user => {
-                return (
-                    <div key={user.id} className="border-b-2 text-[17px] font-medium py-3">
-                        <p className="flex text-gray-800">Username: <p className="ml-2 text-blue-900">{user.username}</p></p>
-                        <p className="flex text-gray-800">Email: <p className="ml-2 f text-blue-900">{user.email}</p></p>
-                        <p className="flex text-gray-800">Phone: <p className="ml-2 text-blue-900">{user.phone}</p></p>
-                        <p className="flex text-gray-800">Code: <p className="ml-2 text-blue-900">{user.code}</p></p>
-                        <div className="mt-3">
-                            <button><Link onClick={e=>!user.code ? e.preventDefault() : null}  to= {`/admin/user/edit?userId=${user.code}`}  className=" p-3 border shadow rounded-lg bg-green-300" >Edit</Link> </button>
-                            <button onClick={()=>deleteUser(user.code)} className=" ml-4 p-3 border shadow rounded-lg bg-red-400" >Delete</button>
-                        </div>                        
-                    </div>
-                )
-            })}          
-        </ul>
-        <table className=" overflow-hidden  invisible md:visible  bg-zinc-100 my-3">
-            <thead className=" flex border-b-2 border-blue-200">
-                <tr className=" flex space-x-40">
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Code</th>
-                    <th>Actions</th>
-                </tr>
+      {/* search */}
+      <form onSubmit={handleSearch} className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <input
+          type="text"
+          placeholder="Search by code / phone / email / name"
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          className="w-full sm:w-96 rounded-md border border-stone-300 bg-stone-100 px-3 py-2 text-sm shadow-inner focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+        />
+        <button
+          type="submit"
+          className="rounded-md bg-amber-500 px-4 py-2 text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+        >
+          Search
+        </button>
+        {filtered && (
+          <button
+            type="button"
+            onClick={() => {
+              setFiltered(null);
+              setSearchId("");
+            }}
+            className="rounded-md bg-stone-300 px-4 py-2 text-sm font-medium text-stone-800 shadow hover:bg-stone-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-500"
+          >
+            Clear
+          </button>
+        )}
+      </form>
+
+      {/* message bar */}
+      {error && (
+        <p className="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-700 shadow">{error}</p>
+      )}
+      {filtered && (
+        <p className="mb-4 rounded-md bg-amber-100 px-4 py-2 text-sm text-amber-800 shadow">User found – showing search result</p>
+      )}
+
+      {/* responsive list / table */}
+      <div className="space-y-4 md:hidden">
+        {collection.map((user) => (
+          <article
+            key={user.id}
+            className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm"
+          >
+            <p className="font-medium">
+              <span className="text-stone-500">Username:</span> {user.username}
+            </p>
+            <p className="truncate"><span className="text-stone-500">Email:</span> {user.email}</p>
+            <p><span className="text-stone-500">Phone:</span> {user.phone}</p>
+            <p><span className="text-stone-500">Code:</span> {user.code}</p>
+
+            <div className="mt-3 flex gap-3">
+              <Link
+                to={`/admin/user/edit?userId=${user.code}`}
+                className="flex-1 rounded-md bg-amber-500 px-3 py-2 text-center text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+              >
+                Edit
+              </Link>
+              <button
+                onClick={() => deleteUser(user.code)}
+                className="flex-1 rounded-md bg-red-500 px-3 py-2 text-sm font-medium text-white shadow hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+              >
+                Delete
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {/* desktop table */}
+      <div className="hidden md:block">
+        <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white shadow-sm">
+          <table className="min-w-full divide-y divide-stone-200">
+            <thead className="bg-stone-100 text-left text-sm font-medium uppercase tracking-wider text-stone-600">
+              <tr>
+                <th className="px-6 py-3">Username</th>
+                <th className="px-6 py-3">Email</th>
+                <th className="px-6 py-3">Phone</th>
+                <th className="px-6 py-3">Code</th>
+                <th className="px-6 py-3 text-center">Actions</th>
+              </tr>
             </thead>
-            <tbody className="">
-             {searchUsers.map(user=> {
-                return (
-                <tr key={user.id} className=" flex space-x-28 my-2 mb-6 border-b-2 ">
-                    <td>{user.username}</td>
-                    <td>{user.email}</td>
-                    <td>{user.phone}</td>
-                    <td>{user.code}</td>
-                    <td><Link onClick={e=> !user.code ? e.preventDefault() : null}  to= {`/admin/user/edit?userId=${user.code}`}  className=" w-6 h-2 p-2 border shadow rounded-lg bg-green-300" >Edit</Link> </td>
-                    <button onClick={()=>deleteUser(user.code)} className=" ml-4 p-3 border shadow rounded-lg bg-red-400" >Delete</button>              
+            <tbody className="divide-y divide-stone-200 text-sm">
+              {collection.map((user) => (
+                <tr key={user.id} className="hover:bg-stone-50">
+                  <td className="whitespace-nowrap px-6 py-3">{user.username}</td>
+                  <td className="whitespace-nowrap px-6 py-3">{user.email}</td>
+                  <td className="whitespace-nowrap px-6 py-3">{user.phone}</td>
+                  <td className="whitespace-nowrap px-6 py-3">{user.code}</td>
+                  <td className="whitespace-nowrap px-6 py-3 text-center">
+                    <div className="flex justify-center gap-3">
+                      <Link
+                        to={`/admin/user/edit?userId=${user.code}`}
+                        className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => deleteUser(user.code)}
+                        className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-medium text-white shadow hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-                )
-             })}
+              ))}
             </tbody>
-        </table>    
-    </section>
-    :
-    <section className={errMsg? " flex flex-col h-[100vh] items-center justify-center  mt-28": " w-[80vw] mx-1 md:ml-[18%] lg:ml-[12%] mt-28"}>
-        {errMsg ? 
-            <div className="text-center border shadow rounded-md text-lg 
-                md:text-2xl font-bold text-gray-800 bg-violet-100">
-                <div className="relative w-[80vw] h-[80vh]">
-                    <h1 className=" absolute top-[35vh] mx-4 md:mx-60">{errMsg}</h1>  
-                    <h1 className=" text-red-500 top-[50vh] absolute mx-4 md:mx-96">401</h1>    
-                </div>
-            </div> : null
-        }
-        <div className={errMsg ? "hidden": ""}>        
-            <div className="my-1 md:w-[50%]">
-                <h1 className=" text-lg md:text-xl text-center bg-blue-200 font-semibold">Admin User's Management DashBoard</h1>
-            </div>
-
-            <div>
-                <input onKeyDown={(e)=>(e.key === "Enter" ? searchUser(e,searchId) : null)} placeholder="firstName/lastName/phone/email" className="w-96 text-lg p-2 h-11 bg-indigo-200 text-gray-700" type="text" value={searchId} onChange={e=>setSearchId(e.target.value)}/>
-                <button  onClick={(e) => searchUser(e, searchId)} className="h-11 p-2 ml-1 text-lg bg-blue-300 rounded-md text-gray-700 hover:bg-blue-500 hover:translate-y-[1px] ">Search</button>
-            </div>
-
-            <div className="my-3">
-                <Link  to= "/admin/user/add"  className=" w-11 h-4 p-2 border shadow rounded-lg bg-blue-500" >Add User</Link>
-            </div>
-
-            <div className="font-bold text-lg ">
-                <h1>User Info</h1>
-            </div>
-
-            <ul className="md:hidden">
-                { users? users.map(user => {
-                    return (
-                        <div key={user.id} className="border-b-2 text-[17px] font-medium py-3">
-                            <p className="flex text-gray-800">Username: <p className="ml-2 text-blue-900">{user.username}</p></p>
-                            <p className="flex text-gray-800">Email: <p className="ml-2 f text-blue-900">{user.email}</p></p>
-                            <p className="flex text-gray-800">Phone: <p className="ml-2 text-blue-900">{user.phone}</p></p>
-                            <p className="flex text-gray-800">Code: <td className="ml-40">{user.code}</td></p>    
-                            <div className="mt-3">
-                                <button><Link onClick={e=> !user.code ? e.preventDefault(): null}  to= {`/admin/user/edit?userId=${user.code}`}  className=" p-3 border shadow rounded-lg bg-green-300" >Edit</Link> </button>
-                                <button onClick={()=>deleteUser(user.code)} className=" ml-4 p-3 border shadow rounded-lg bg-red-400" >Delete</button>
-                            </div>                        
-                        </div>
-                    )
-                }) : null}          
-            </ul>
-            <table className="  invisible md:visible  bg-zinc-100 my-3">
-                <thead className=" flex border-b-2 border-blue-200">
-                    <tr className=" mx-3 flex space-x-40">
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Code</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody className="">
-                {users? users.map(user=> {
-                    return (
-                    <tr key={user.id} className=" w-screen mx-3 flex my-2 mb-6 border-b-2 ">
-                        <td className="">{user.username}</td>
-                        <td className="ml-40">{user.email}</td>
-                        <td className="ml-40">{user.phone}</td>
-                        <td className="ml-40">{user.code}</td>                                   
-                        <td><Link onClick={e=>!user.code ? e.preventDefault() : null} to= {`/admin/user/edit?userId=${user.code}`}  className=" w-6 h-2 p-2 border shadow rounded-lg bg-green-300" >Edit</Link> </td>
-                        <button onClick={()=>deleteUser(user.code)} className=" ml-2 p-2 border shadow rounded-lg bg-red-400" >Delete</button>              
-                    </tr>
-                    )
-                }): null}
-                </tbody>
-            </table>
+          </table>
         </div>
-
-    </section> }
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminUser
+export default AdminUser;
