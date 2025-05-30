@@ -40,7 +40,7 @@ const Map = () => {
         let features = response.data.features;
         console.log(features)
         if (userCode) {
-          features = features.filter(f => f.properties.CODE_PRODUCTEUR === userCode);
+          features = features.filter(f => f.properties.producerCode === userCode);
         }
         if (searchQuery) {
           features = features.filter(f =>
@@ -63,7 +63,7 @@ const Map = () => {
 
   const fieldLabels = {
     id: "Parcel Code",
-    CODE_PRODUCTEUR: "Producer Code",
+    producerCode: "Producer Code",
     name: "First Name",
     surname: "Last Name",
     sex: "Sex",

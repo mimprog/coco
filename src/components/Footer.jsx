@@ -21,7 +21,7 @@ const Footer = () => {
         </div>
       </div>
       <div className=" m-2 bg-slate-200">
-        <h1 className=''>  @copy; copyright 2023. All Rights reserved </h1>
+        <h1 className=''>  @copy; copyright 2025. All Rights reserved </h1>
       </div>
     </footer>
   );

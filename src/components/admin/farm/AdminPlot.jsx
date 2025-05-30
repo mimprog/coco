@@ -42,25 +42,34 @@ const AdminPlot = () => {
     getPlots();
   }, [token]);
 
-  const searchPlot = async (e, name) => {
-    e.preventDefault();
-    try {
-      const res = await axios.get(PLOT_URL, {
-        headers: { Authorization: `Bearer ${token}`, withCredentials: true },
-      });
-      if (Array.isArray(res.data)) {
-        const filtered = res.data.filter((el) =>
-          el.name.toLowerCase().includes(name.toLowerCase())
+const searchPlot = async (e, query) => {
+  e.preventDefault();
+  try {
+    const res = await axios.get(PLOT_URL, {
+      headers: { Authorization: `Bearer ${token}`, withCredentials: true },
+    });
+    if (Array.isArray(res.data)) {
+      const filtered = res.data.filter((el) => {
+        const q = query.toLowerCase();
+        return (
+          (el.userCode && el.userCode.toLowerCase().includes(q)) ||
+          (el.id && String(el.id).toLowerCase().includes(q)) ||
+          (el.village && el.village.toLowerCase().includes(q)) ||
+          (el.departement && el.departement.toLowerCase().includes(q)) ||
+          (el.tel && el.tel.toLowerCase().includes(q)) ||
+          (el.x && String(el.x).toLowerCase().includes(q)) ||
+          (el.y && String(el.y).toLowerCase().includes(q))
         );
-        setSearchplots(filtered);
-        setCurrentPage(1); // Reset page when searching
-      } else {
-        setSearchplots([]);
-      }
-    } catch (err) {
-      setErrMsg(err?.response?.data?.message || "Search failed");
+      });
+      setSearchplots(filtered);
+      setCurrentPage(1); // Reset page when searching
+    } else {
+      setSearchplots([]);
     }
-  };
+  } catch (err) {
+    setErrMsg(err?.response?.data?.message || "Search failed");
+  }
+};
 
   const deletePlot = async (id) => {
     try {
@@ -145,6 +154,7 @@ const AdminPlot = () => {
           <thead className="sticky top-0 bg-amber-300 text-gray-900 font-semibold">
             <tr>
               <th className="p-2 border-r whitespace-nowrap">Id</th>
+              <th className="p-2 border-r whitespace-nowrap">User Code</th>
               <th className="p-2 border-r whitespace-nowrap">Statut</th>
               <th className="p-2 border-r whitespace-nowrap">Operateur</th>
               <th className="p-2 border-r whitespace-nowrap">Subdivision</th>
@@ -173,7 +183,6 @@ const AdminPlot = () => {
               <th className="p-2 border-r whitespace-nowrap">Photo</th>
               <th className="p-2 border-r whitespace-nowrap">X</th>
               <th className="p-2 border-r whitespace-nowrap">Y</th>
-              <th className="p-2 border-r whitespace-nowrap">QR_URL</th>
               <th className="p-2 whitespace-nowrap">Actions</th>
             </tr>
           </thead>
@@ -185,6 +194,7 @@ const AdminPlot = () => {
                   className="hover:bg-amber-100 border-b border-amber-300"
                 >
                   <td className="p-1 border-r">{plot.id}</td>
+                  <td className="p-1 border-r">{plot.userCode}</td>
                   <td className="p-1 border-r">{plot.statut}</td>
                   <td className="p-1 border-r">{plot.operateur}</td>
                   <td className="p-1 border-r">{plot.subdivision}</td>
@@ -224,18 +234,6 @@ const AdminPlot = () => {
                   <td className="p-1 border-r">{plot.x}</td>
                   <td className="p-1 border-r">{plot.y}</td>
                   <td className="p-1 border-r">
-                    {plot.QR_URL ? (
-                      <a
-                        href={plot.QR_URL}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-blue-600 hover:underline"
-                      >
-                        QR Link
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
                   </td>
                   <td className="p-1 whitespace-nowrap">
                     <Link

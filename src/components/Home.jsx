@@ -36,7 +36,7 @@ const Home = () => {
 
   useEffect(() => {
     if (userCode) {
-      setUrl(`${window.location.origin}/#/map?code=${userCode}`);
+      setUrl(`${window.location.origin}/#/map?userCode=${userCode}`);
     }
   }, [userCode]);
 
@@ -239,16 +239,17 @@ const Home = () => {
       {/* Footer */}
       <footer className="bg-[#4B2E20] text-[#D9C4B2] py-8 mt-auto select-none">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-around text-center md:text-left gap-10 px-6">
-          <div>
-            <h4 className="font-semibold mb-3 text-white text-lg tracking-wide">Contacts</h4>
-            <p>(+237) 656 10 10 91</p>
-            <p>(+237) 671 96 39 41</p>
+          <div className=" flex-col space-y-2">
+            <h4 className="font-semibold text-white text-lg tracking-wide">Contacts</h4>
+            <p>(+237) 653 419 541</p>
+            <p>(+237) 693 184 717</p>
           </div>
           <div>
             <h4 className="font-semibold mb-3 text-white text-lg tracking-wide">Email Address</h4>
-            <p>Audrey@gmail.com</p>
+            <p>nkendzohaudrey@gmail.com</p>
             <h4 className="font-semibold mt-8 mb-3 text-white text-lg tracking-wide">Additional Info</h4>
-            <p>Engineer in Topography and Cadastre</p>
+            <p>Engineer in Topography and Cartography</p>
+            <p>GIS, Remote Sensing</p>
           </div>
           {userCode && (
             <div className="flex flex-col items-center">
@@ -263,9 +264,13 @@ const Home = () => {
             </div>
           )}
         </div>
-        <p className="text-center text-sm mt-10 opacity-70 tracking-wide">
-          &copy; 2025 Cocoa Trace Cameroon. All rights reserved.
-        </p>
+
+        <div className="  text-center text-lg mt-10 opacity-100">
+          <p>
+            
+          </p>
+          &copy; 2025 Cocoa Trace by <span className="font-bold mx-2 text-white text-lg"> NkENDZOH </span> Cameroon. All rights reserved.
+        </div>
       </footer>
     </div>
   );
