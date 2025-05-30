@@ -54,7 +54,7 @@ function App() {
   const {userInfo} = useSelector(state => state.auth);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isEditor, setIsEditor] = useState(false);
-  
+ 
   //console.log(isAdmin, isEditor);
   return (
    

@@ -36,7 +36,7 @@ const Home = () => {
 
   useEffect(() => {
     if (userCode) {
-      setUrl(`${window.location.origin}/#/map?userCode=${userCode}`);
+      setUrl(`${window.location.origin}/#/map?producerCode=${userCode}`);
     }
   }, [userCode]);
 

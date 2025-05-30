@@ -31,7 +31,7 @@ const Map = () => {
   const { isActiveModalNavbar } = useMimlyrics();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const userCode = searchParams.get("code");
+  const userCode = searchParams.get("producerCode");
 
   useEffect(() => {
     const fetchGeoJson = async () => {
@@ -44,7 +44,7 @@ const Map = () => {
         }
         if (searchQuery) {
           features = features.filter(f =>
-            f.properties.CODE_PRODUCTEUR?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            f.properties.producerCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             f.properties.village?.toLowerCase().includes(searchQuery.toLowerCase())
           );
         }
