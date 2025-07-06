@@ -1,6 +1,6 @@
 // Base URL configuration
 //const CLIENT_URL = "http://localhost:3000"; // Single source of truth for base URL
-const CLIENT_URL = 'https://coco-ydre.onrender.com/';
+const CLIENT_URL = 'https://coco-ydre.onrender.com';
 
 // Frontend site URLs (for navigation/linking)
 const SITE_URL = {
