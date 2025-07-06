@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { useLocation } from "react-router-dom";
 import { PLOT_URL } from "../../routes/serverRoutes";
+import { ADMIN_ADD_PLOT, ADMIN_EDIT_PLOT } from "../../routes/clientRoutes";
 console.log(PLOT_URL);
 
 const AdminPlot = () => {
@@ -131,7 +132,7 @@ const searchPlot = async (e, query) => {
         </button>
 
         <Link
-          to="/admin/plot/add"
+          to={`${ADMIN_ADD_PLOT}`}
           className="ml-auto p-2 border shadow rounded-lg bg-blue-100 hover:bg-blue-300 hover:translate-y-1 transition"
         >
           Ajouter plot
@@ -237,7 +238,7 @@ const searchPlot = async (e, query) => {
                   </td>
                   <td className="p-1 whitespace-nowrap">
                     <Link
-                      to={`/admin/plot/edit?searchId=${plot.id}`}
+                      to={`${ADMIN_EDIT_PLOT}?plotId=${plot.id}`}
                       className="p-1 bg-green-200 rounded hover:bg-green-400 mr-2 transition"
                     >
                       Edit

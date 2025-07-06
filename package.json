@@ -16,6 +16,7 @@
     "date-fns": "^4.1.0",
     "datepicker-react": "^0.9.6",
     "framer-motion": "^12.12.1",
+    "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "leaflet": "^1.9.4",
     "qrcode.react": "^4.1.0",

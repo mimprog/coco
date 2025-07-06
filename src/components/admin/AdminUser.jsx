@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
 import axios from "../api/axios";
 import { USERS_URL } from "../routes/serverRoutes";
+import { ADMIN_ADD_USER, ADMIN_EDIT_USER } from "../routes/clientRoutes";
 
 const AdminUser = () => {
   const [users, setUsers] = useState([]);
@@ -64,7 +65,7 @@ const AdminUser = () => {
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl sm:text-3xl font-bold text-amber-800">User Management Dashboard</h1>
         <Link
-          to="/admin/user/add"
+          to={`${ADMIN_ADD_USER}`}
           className="inline-block rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-amber-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
         >
           Add User
@@ -135,7 +136,7 @@ const AdminUser = () => {
 
             <div className="mt-3 flex gap-3">
               <Link
-                to={`/admin/user/edit?userId=${user.code}`}
+                to={`${ADMIN_EDIT_USER}?userId=${user.code}`}
                 className="flex-1 rounded-md bg-amber-500 px-3 py-2 text-center text-sm font-medium text-white shadow hover:bg-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
               >
                 Edit

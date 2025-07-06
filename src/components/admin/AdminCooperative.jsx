@@ -4,6 +4,7 @@ import axios from "../api/axios";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
 import { COOPERATIVE_URL } from "../routes/serverRoutes";
 import { useSelector } from "react-redux";
+import { ADMIN_ADD_COOPERATIVE, ADMIN_EDIT_COOPERATIVE } from "../routes/clientRoutes";
 
 const AdminCooperative = () => {
   const [searchId, setSearchId] = useState("");
@@ -96,7 +97,7 @@ const AdminCooperative = () => {
           </button>
         </div>
         <Link
-          to="/admin/cooperative/add"
+          to={`${ADMIN_ADD_COOPERATIVE}`}
           className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 shadow"
         >
           Ajouter une coopérative
@@ -117,7 +118,7 @@ const AdminCooperative = () => {
             </p>
             <div className="mt-3 flex gap-2">
               <Link
-                to={`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}
+                to={`${ADMIN_EDIT_COOPERATIVE}?cooperativeId=${cooperative.id}`}
                 className="flex-1 text-center bg-green-500 text-white py-2 rounded hover:bg-green-600"
               >
                 Modifier

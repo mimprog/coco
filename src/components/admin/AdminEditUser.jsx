@@ -6,6 +6,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import axios from "../api/axios";
 import { USERS_URL } from "../routes/serverRoutes";
+import { ADMIN_USERS } from "../routes/clientRoutes";
 const PASSWORD_REGEX = /^[A-Za-z]\w{7,14}$/;
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -30,9 +31,9 @@ const AdminEditUser = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const query = hash.includes("?") ? hash.split("?")[1] : "";
-    const { code } = queryString.parse(query);
+    //const hash = window.location.hash;
+    //const query = hash.includes("?") ? hash.split("?")[1] : "";
+    const { code } = queryString.parse(location.search);
     if (code) {
       setId(code);
     }
@@ -85,7 +86,7 @@ const AdminEditUser = () => {
         if(res?.data) {
             setTimeout(() => {
               setSuccess(true);
-              navigate("/admin/user");
+              window.location.href = ADMIN_USERS
             }, [1000])
         }
       }

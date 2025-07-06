@@ -3,6 +3,7 @@ import axios from "../api/axios";
 import { COOPERATIVE_URL } from "../routes/serverRoutes";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
 import { useSelector } from "react-redux";
+import { ADMIN_COOPERATIVES } from "../routes/clientRoutes";
 const AdminAddCooperative = () => {
   const [name, setName] = useState("");
   const [errMsg, setErrMsg] = useState("");
@@ -33,6 +34,9 @@ const AdminAddCooperative = () => {
             setSuccess(`${name} has been added successfully`);
             setName("");
             setErrMsg("");
+            setTimeout(() => {
+          window.location.href = ADMIN_COOPERATIVES;
+        }, [2000])
         }
     }catch(err) {
         console.log(err?.response?.data?.error);

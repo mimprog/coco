@@ -7,6 +7,7 @@ import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import queryString  from 'query-string';
 import { COOPERATIVE_URL, PURCHASE_URL, USERS_URL, PLOT_URL } from "../../routes/serverRoutes";
 import CLIENT_URL from "../../routes/clientRoutes";
+import { ADMIN_PURCHASES } from "../../routes/clientRoutes";
 const AdminEditPurchase = () => {
     const [errMsg, setErrMsg] = useState("");
 
@@ -37,9 +38,9 @@ const AdminEditPurchase = () => {
 
 
     useEffect(() => {
-  const hash = window.location.hash;
-  const query = hash.includes('?') ? hash.split('?')[1] : '';
-  const { purchaseId } = queryString.parse(query);
+  //const hash = window.location.hash;
+  //const query = hash.includes('?') ? hash.split('?')[1] : '';
+  const { purchaseId } = queryString.parse(location.search);
   console.log("exporterId:", purchaseId);
 
   if (purchaseId) {
@@ -119,7 +120,7 @@ const AdminEditPurchase = () => {
       if(res) {
         setSuccess(res?.data?.message);
         setTimeout(()=> {
-          window.location.href = `${CLIENT_URL}/#/admin/purchase`;
+          window.location.href = ADMIN_PURCHASES;
         }, [2000])
         
       }

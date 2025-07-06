@@ -6,6 +6,8 @@ import { formatDistanceToNow } from "date-fns";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { PURCHASE_URL } from "../../routes/serverRoutes";
 import TimeAgo from "react-timeago";
+import { translations, t } from "../../../constants/translation"; 
+import { ADMIN_EDIT_PURCHASE, ADMIN_ADD_PURCHASE } from "../../routes/clientRoutes";
 const AdminPurchase = () => {
   const [purchases, setPurchases] = useState([]);
   const [filteredPurchases, setFilteredPurchases] = useState(null);
@@ -110,7 +112,7 @@ const AdminPurchase = () => {
 
       <div className="mb-6 text-center">
         <Link
-          to="/admin/purchase/add"
+          to={`${ADMIN_ADD_PURCHASE}`}
           className="inline-block px-6 py-2 bg-amber-700 text-white rounded hover:bg-amber-800"
         >
           Add Purchase
@@ -146,7 +148,7 @@ const AdminPurchase = () => {
 
                   <td className="px-4 py-3 space-x-2">
                     <Link
-                      to={`/admin/purchase/edit?purchaseId=${purchase.id}`}
+                      to={`${ADMIN_EDIT_PURCHASE}?purchaseId=${purchase.id}`}
                       className="inline-block px-3 py-1 bg-green-200 text-green-900 rounded hover:bg-green-300"
                     >
                       Edit

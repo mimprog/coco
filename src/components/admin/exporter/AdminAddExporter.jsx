@@ -3,7 +3,7 @@ import axios from "../../api/axios";
 import { EXPORTER_URL } from "../../routes/serverRoutes";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { useSelector } from "react-redux";
-
+import { ADMIN_EXPORTERS } from "../../routes/clientRoutes";
 const AdminAddExporter = () => {
   const [name, setName] = useState("");
   const [errMsg, setErrMsg] = useState("");
@@ -39,6 +39,9 @@ const AdminAddExporter = () => {
         setSuccess(`"${name}" was added successfully.`);
         setName("");
         setErrMsg("");
+        setTimeout(() => {
+          window.location.href = ADMIN_EXPORTERS;
+        }, [2000])
       }
     } catch (err) {
       console.log(err?.response?.data?.error);

@@ -4,6 +4,7 @@ import axios from "../../api/axios";
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { EXPORTER_URL } from "../../routes/serverRoutes";
+import { ADMIN_ADD_EXPORTER, ADMIN_EDIT_EXPORTER } from "../../routes/clientRoutes";
 
 const AdminExporter = () => {
   const [exporters, setExporters] = useState([]);
@@ -102,7 +103,7 @@ const AdminExporter = () => {
 
       <div className="mb-6 text-center">
         <Link
-          to="/admin/exporter/add"
+          to={`${ADMIN_ADD_EXPORTER}`}
           className="inline-block px-6 py-2 bg-amber-700 text-white rounded hover:bg-amber-800"
         >
           Add Exporter
@@ -119,7 +120,7 @@ const AdminExporter = () => {
             <p className="font-semibold">Name: <span className="text-blue-900">{exp.name}</span></p>
             <div className="mt-3 space-x-2">
               <Link
-                to={`/admin/exporter/edit?cooperativeId=${exp.id}`}
+                to={`${ADMIN_EDIT_EXPORTER}?exporterId=${exp.id}`}
                 className="inline-block px-3 py-1 bg-green-300 rounded hover:bg-green-400"
               >
                 Edit

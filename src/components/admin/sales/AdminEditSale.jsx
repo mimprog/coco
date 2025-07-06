@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import queryString  from 'query-string';
 import { COOPERATIVE_URL, SALE_URL, EXPORTER_URL } from "../../routes/serverRoutes";
-import CLIENT_URL from "../../routes/clientRoutes";
+import CLIENT_URL, { ADMIN_SALES } from "../../routes/clientRoutes";
 const AdminEditSale = () => {
     const [errMsg, setErrMsg] = useState("");
 
@@ -36,10 +36,10 @@ const AdminEditSale = () => {
 
 
     useEffect(() => {
-  const hash = window.location.hash;
-  const query = hash.includes('?') ? hash.split('?')[1] : '';
-  const { saleId } = queryString.parse(query);
-  console.log("exporterId:", saleId);
+  //const hash = window.location.hash;
+  //const query = hash.includes('?') ? hash.split('?')[1] : '';
+  const { saleId } = queryString.parse(location.search);
+  console.log("saleId:", saleId);
 
   if (saleId) {
     setIdx(saleId);
@@ -117,7 +117,7 @@ const AdminEditSale = () => {
       if(res) {
         setSuccess(res?.data?.message);
         setTimeout(()=> {
-          window.location.href = `${CLIENT_URL}/#/admin/sale`;
+          window.location.href = ADMIN_SALES;
         }, [1000])
         
       }

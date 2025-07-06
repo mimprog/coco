@@ -8,7 +8,7 @@ const USERS_URL = "/api/v1/users/users";
 const COOPERATIVES_URL = "/api/v1/cooperatives/cooperatives";
 
 const USER_PROFILE_URL = "/api/v1/users/users";
-import CLIENT_URL from "../../routes/clientRoutes";
+import CLIENT_URL, { ADMIN_SALES } from "../../routes/clientRoutes";
 const COOPERATIVE_URL = "/api/v1/cooperatives/cooperatives";
 const SALE_URL = "/api/v1/sales/sales";
 const EXPORTER_URL = "/api/v1/exporters/exporters";
@@ -89,7 +89,7 @@ const AdminAddSale = () => {
       if(res) {
         setSuccess(res?.data?.message);
         setTimeout(()=> {
-          window.location.href = `${CLIENT_URL}/#/admin/sale`;
+          window.location.href = ADMIN_SALES;
         }, [2000])
         
       }

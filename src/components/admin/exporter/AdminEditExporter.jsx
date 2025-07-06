@@ -4,6 +4,7 @@ import axios from "../../api/axios";
 import { EXPORTER_URL } from "../../routes/serverRoutes";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { useSelector } from "react-redux";
+import { ADMIN_EXPORTERS } from "../../routes/clientRoutes";
 
 const AdminEditExporter = () => {
   const [name, setName] = useState("");
@@ -14,9 +15,9 @@ const AdminEditExporter = () => {
   const token = useSelector(selectCurrentToken);
 
 useEffect(() => {
-  const hash = window.location.hash;
-  const query = hash.includes('?') ? hash.split('?')[1] : '';
-  const { exporterId } = queryString.parse(query);
+  //const hash = window.location.hash;
+  //const query = hash.includes('?') ? hash.split('?')[1] : '';
+  const { exporterId } = queryString.parse(location.search);
   console.log("exporterId:", exporterId);
 
   if (exporterId) {
@@ -63,7 +64,10 @@ useEffect(() => {
       if (res?.data) {
         setSuccess(`Exporter "${name}" updated successfully.`);
         setErrMsg("");
-        setTimeout(() => setSuccess(""), 3000);
+                setTimeout(() => {
+                  setSuccess("");
+          window.location.href = ADMIN_EXPORTERS;
+        }, [2000])
       }
     } catch (err) {
       console.error(err);

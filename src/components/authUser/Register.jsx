@@ -16,7 +16,7 @@ import {
 } from "react-icons/fa6";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
-import { useMimlyrics } from "../context/AppProvider";
+import { useGlobalState } from "../context/AppProvider";
 
 const FIRSTNAME_REGEX = /^[a-zA-Z0-9]+$/;
 const CODE_REGEX = /^[a-zA-Z0-9]+$/;

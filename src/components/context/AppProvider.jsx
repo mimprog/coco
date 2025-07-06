@@ -1,23 +1,32 @@
-import {useState, useContext, createContext} from "react";
-const MimlyricsContext = createContext();
-export function useMimlyrics () {
-    return useContext(MimlyricsContext);
+import {useState, useContext, createContext, useEffect} from "react";
+const AppContext = createContext();
+import { translations } from "../../constants/translation";
+export function useGlobalState () {
+    return useContext(AppContext);
 }
 const AppProvider = ({children}) => {
-  const [language, setLanguage] = useState("");
   const [isActiveModalNavbar, setIsActiveModalNavbar] = useState(false);
   const [isActivePage, setIsActivePage] = useState(false);
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('appLanguage') || 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('appLanguage', language);
+  }, [language]);
+
   const value = {
     language: language,
+    setLanguage: setLanguage,
     isActiveModalNavbar: isActiveModalNavbar,
     setIsActiveModalNavbar: setIsActiveModalNavbar,
     isActivePage: setIsActivePage,
   }
 
   return (
-    <MimlyricsContext.Provider value={value}>
+    <AppContext.Provider value={value}>
       {children}
-    </MimlyricsContext.Provider>
+    </AppContext.Provider>
   )
 }
 

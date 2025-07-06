@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { SALE_URL } from "../../routes/serverRoutes";
 import TimeAgo from "react-timeago";
+import { ADMIN_ADD_SALE, ADMIN_EDIT_SALE } from "../../routes/clientRoutes";
 
 const AdminSale = () => {
   const [sales, setSales] = useState([]);
@@ -103,7 +104,7 @@ const AdminSale = () => {
           Reset
         </button>
         <Link
-          to="/admin/sale/add"
+          to={`${ADMIN_ADD_SALE}`}
           className="ml-auto px-4 py-2 bg-blue-200 hover:bg-blue-300 text-blue-900 font-semibold rounded-md shadow"
         >
           Add Sale
@@ -141,7 +142,7 @@ const AdminSale = () => {
                 </td>
                 <td className="p-2 flex flex-wrap gap-2">
                   <Link
-                    to={`/admin/sale/edit?saleId=${sale.id}`}
+                    to={`${ADMIN_EDIT_SALE}?saleId=${sale.id}`}
                     className="px-3 py-1 bg-green-200 hover:bg-green-400 text-green-800 rounded-md"
                   >
                     Edit

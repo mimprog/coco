@@ -5,7 +5,7 @@ import { IoIosArrowDropup, IoMdArrowDropdown, IoMdArrowDropup } from "react-icon
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { COOPERATIVE_URL, USERS_URL, PURCHASE_URL} from "../../routes/serverRoutes";
-import CLIENT_URL from "../../routes/clientRoutes";
+import CLIENT_URL, { ADMIN_PURCHASES } from "../../routes/clientRoutes";
 const AdminAddPurchase = () => {
     const [errMsg, setErrMsg] = useState("");
     const [searchplots, setSearchplots] = useState(null);
@@ -81,7 +81,7 @@ const AdminAddPurchase = () => {
       if(res) {
         setSuccess(res?.data?.message);
         setTimeout(()=> {
-          window.location.href = `${CLIENT_URL}/#/admin/purchase`;
+          window.location.href = ADMIN_PURCHASES;
         }, [2000])
         
       }

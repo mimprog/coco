@@ -5,6 +5,7 @@ import { COOPERATIVE_URL } from "../routes/serverRoutes";
 import { useSelector } from "react-redux";
 import { selectCurrentToken } from "../../slices/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { ADMIN_COOPERATIVES } from "../routes/clientRoutes";
 
 const AdminEditCooperative = () => {
   const [name, setName] = useState("");
@@ -14,11 +15,12 @@ const AdminEditCooperative = () => {
   const navigate = useNavigate();
   const token = useSelector(selectCurrentToken);
 
+
   // ✅ Get cooperativeId from hash-based URL
   useEffect(() => {
-    const hash = window.location.hash;
-    const query = hash.includes("?") ? hash.split("?")[1] : "";
-    const { cooperativeId } = queryString.parse(query);
+    //const hash = window.location.hash;
+    //const query = hash.includes("?") ? hash.split("?")[1] : "";
+    const { cooperativeId } = queryString.parse(location.search);
     if (cooperativeId) {
       setId(cooperativeId);
     }
@@ -29,8 +31,8 @@ const AdminEditCooperative = () => {
     if (!id) return;
     const getCooperative = async () => {
       try {
-        const res = await axios.get(`${COOPERATIVE_URL}/${id}`, {
-          headers: { withCredentials: true },
+        const res = await axios.get(`${COOPERATIVE_URL}/${id}`, 
+          {headers: {Authorization: `Bearer ${token}`,withCredentials: true},
         });
         setName(res.data.name);
       } catch (err) {
@@ -59,8 +61,8 @@ const AdminEditCooperative = () => {
         setSuccess(`"${name}" updated successfully.`);
         setErrMsg("");
         setTimeout(() => {
-          navigate("/admin/cooperative");
-        }, 2000);
+          window.location.href = ADMIN_COOPERATIVES;
+        }, [2000])
       }
     } catch (err) {
       console.log(err);
