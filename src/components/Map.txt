@@ -1,10 +1,10 @@
 // [unchanged imports]
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import "./css/index.css";
 import { useGlobalState} from "./context/AppProvider";
 import { Link, useLocation } from "react-router-dom";
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import BASE_URL from "./routes/serverRoutes";
 import classNames from "classnames";
 import jsPDF from "jspdf";
@@ -28,8 +28,9 @@ const themeColors = {
 };
 
 const teamColorMap = {
-  farmlands: "red",
-  Massock_And_Ngambe_Subdiviions: "teal"
+  filter: "yellow",
+  default: "red",
+  limit: "purple"
 };
 
 const Map = () => {
@@ -46,7 +47,6 @@ const Map = () => {
   const [features, setFeatures] = useState([]);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
    const [limitGeojsonData, setLimitGeojsonData] = useState(null);
-   const mapRef = useRef();
 
   const [filter, setFilter] = useState({
     producerCode: "",
@@ -87,27 +87,6 @@ const Map = () => {
 
  }, [])
 
- const FitBoundsOnFilter = ({ geojson }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!geojson || geojson.length === 0) return;
-
-    const bounds = geojson.reduce((acc, feature) => {
-      const coords = feature.geometry.coordinates[0][0];
-      coords.forEach(([lng, lat]) => acc.push([lat, lng]));
-      return acc;
-    }, []);
-
-    if (bounds.length > 0) {
-      map.fitBounds(bounds, { padding: [20, 20] });
-    }
-  }, [geojson, map]);
-
-  return null;
-};
-
-
 
 
   useEffect(() => {
@@ -144,7 +123,7 @@ const Map = () => {
         }
 
         // Step 2: Style each feature with __highlighted
-        /*const styled = all.map(f => {
+        const styled = all.map(f => {
           const match = filtered.find(m => m.properties.id === f.properties.id);
           return {
             ...f,
@@ -156,10 +135,7 @@ const Map = () => {
         });
 
         setGeojsonData(styled);
-        setFeatures(styled);*/
-    setGeojsonData(filtered); 
-setFeatures(filtered);    
-
+        setFeatures(styled);
       } catch (error) {
         setErrMsg("Failed to load GeoJSON data");
         setTimeout(() => setErrMsg(""), 3000);
@@ -220,16 +196,7 @@ setFeatures(filtered);
     });
   };
 
-
-const getStyle = () => ({
-  fillColor: "red",     // or any single consistent color
-  color: "red",
-  weight: 4,
-  fillOpacity: 0.6,
-});
-
-
-/*const getStyle = (feature) => {
+const getStyle = (feature) => {
   const isHighlighted = feature.properties.__highlighted;
   console.log(feature.properties.producerCode, "highlighted:", isHighlighted);
   return {
@@ -238,7 +205,7 @@ const getStyle = () => ({
     weight: isHighlighted ? 5 : 2,
     fillOpacity: isHighlighted ? 0.8 : 0.4,
   };
-};*/
+};
 
 
 const downloadPDF = async () => {
@@ -420,41 +387,30 @@ const downloadPDF = async () => {
           </div>
         )}
 
-<MapContainer
-  ref={mapRef}
-  center={[4.16934, 10.632949]}
-  zoom={13}
+        <MapContainer center={[4.16934, 10.632949]} zoom={13} style={{ height: "80vh", width: "100%", minHeight: "80vh" }}>
+          <TileLayer url={tileOptions[tileType]} />
+          {geojsonData && <GeoJSON
+  key={JSON.stringify(geojsonData.map(f => f.properties.__highlighted))} // force remount when highlights change
+  data={geojsonData}
+  style={getStyle}
+  onEachFeature={onEachFeature}
 
-  className="h-63vh w-[100%] min-h-[63vh] md:h-[75vh] md:min-h-[65vh]"
->
-  <TileLayer url={tileOptions[tileType]} />
+/>
+}
 
-  {geojsonData && (
-    <>
-      <GeoJSON
-        key={JSON.stringify(geojsonData.map(f => f.properties.__highlighted))}
-        data={geojsonData}
-        style={getStyle}
-        onEachFeature={onEachFeature}
-      />
-      <FitBoundsOnFilter geojson={geojsonData} />
-    </>
-  )}
-
-  {limitGeojsonData && (
-    <GeoJSON 
-      data={limitGeojsonData}
-      style={{
-        color: "teal",
-        weight: 5,
-        fillOpacity: 0.1
-      }}
-      interactive={false}
-      pane="shadowPane"
-    />
-  )}
-</MapContainer>
-
+{limitGeojsonData && (
+  <GeoJSON 
+    data={limitGeojsonData}
+    style={{
+      color: "teal",
+      weight: 5,
+      fillOpacity: 0.1
+    }}
+    interactive={false}
+    pane="shadowPane"  // <-- Renders below features
+  />
+)}
+        </MapContainer>
 
         {selectedData && (
           <div className="mt-8 px-4">
