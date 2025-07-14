@@ -14,7 +14,9 @@ import Footer from "./Footer";
 import 'leaflet/dist/leaflet.css';
 import { translations, t } from "../constants/translation";
 import queryString from "query-string";
+import {motion} from "framer-motion";
 // [tile and theme options]
+
 const tileOptions = {
   OSM: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   "Black & White": "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png",
@@ -47,6 +49,10 @@ const Map = () => {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
    const [limitGeojsonData, setLimitGeojsonData] = useState(null);
    const mapRef = useRef();
+  const [credentials, setCredentials] = useState({username: "", password: ""});
+  const [validCredentials, setValidCredentials] = useState(false);
+
+  console.log(BASE_URL);
 
   const [filter, setFilter] = useState({
     producerCode: "",
@@ -61,6 +67,26 @@ const Map = () => {
 
   const { isActiveModalNavbar } = useGlobalState();
   const location = useLocation();
+
+  const [error, setError] = useState("");
+
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    setError("");
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (
+      credentials.username.trim() === "audrey" && credentials.password.trim() === "audrey123"
+    ) {
+      setValidCredentials(true);
+    } else {
+      setError("Invalid credentials. Please try again.");
+      setValidCredentials(false);
+    }
+  };
+
 
  useEffect (() => {
   const {producerCode} = queryString.parse(location.search);
@@ -336,6 +362,11 @@ const downloadPDF = async () => {
   );
 
   return (
+
+    <>
+    
+  
+    { validCredentials  ? 
     <div className={classNames("min-h-screen", themeColors[theme])}>
       <section className={isActiveModalNavbar ? "relative opacity-60 -z-50 mt-24" : "flex flex-col z-50 mt-24"}>
         <div className="px-4 py-2 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -487,6 +518,74 @@ const downloadPDF = async () => {
         <Footer />
       </section>
     </div>
+
+    : 
+    <div className="flex items-center justify-center min-h-screen bg-yellow-500">
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md mx-4"
+    >
+      <h2 className="text-2xl font-bold text-center text-yellow-600 mb-6">Login</h2>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1">Username</label>
+          <input
+            type="text"
+            name="username"
+            value={credentials.username}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-semibold mb-1">Password</label>
+          <input
+            type="password"
+            name="password"
+            value={credentials.password}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            required
+          />
+        </div>
+
+        {error && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-600 text-sm"
+          >
+            {error}
+          </motion.p>
+        )}
+
+        <motion.button
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.02 }}
+          type="submit"
+          className="w-full py-2 bg-yellow-500 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-600 transition"
+        >
+          Login
+        </motion.button>
+      </form>
+
+      {validCredentials && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-4 text-green-600 text-center font-semibold"
+        >
+          ✅ Logged in successfully!
+        </motion.div>
+      )}
+    </motion.div>
+  </div> }
+    </>
   );
 };
 

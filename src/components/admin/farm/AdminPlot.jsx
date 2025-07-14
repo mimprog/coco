@@ -6,7 +6,6 @@ import { selectCurrentToken } from "../../../slices/auth/authSlice";
 import { useLocation } from "react-router-dom";
 import { PLOT_URL } from "../../routes/serverRoutes";
 import { ADMIN_ADD_PLOT, ADMIN_EDIT_PLOT } from "../../routes/clientRoutes";
-console.log(PLOT_URL);
 
 const AdminPlot = () => {
   const token = useSelector(selectCurrentToken);
