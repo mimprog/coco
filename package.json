@@ -15,7 +15,7 @@
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
     "datepicker-react": "^0.9.6",
-    "framer-motion": "^12.12.1",
+    "framer-motion": "^12.23.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "leaflet": "^1.9.4",
