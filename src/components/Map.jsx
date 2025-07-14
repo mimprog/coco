@@ -52,7 +52,7 @@ const Map = () => {
   const [credentials, setCredentials] = useState({username: "", password: ""});
   const [validCredentials, setValidCredentials] = useState(false);
 
-  console.log(BASE_URL);
+  //console.log(BASE_URL);
 
   const [filter, setFilter] = useState({
     producerCode: "",
