@@ -7,17 +7,17 @@ export function useGlobalState () {
 const AppProvider = ({children}) => {
   const [isActiveModalNavbar, setIsActiveModalNavbar] = useState(false);
   const [isActivePage, setIsActivePage] = useState(false);
-  const [language, setLanguage] = useState(() => {
+  const [lang, setLang] = useState(() => {
     return localStorage.getItem('appLanguage') || 'en';
   });
 
   useEffect(() => {
-    localStorage.setItem('appLanguage', language);
-  }, [language]);
+    localStorage.setItem('appLanguage', lang);
+  }, [lang]);
 
   const value = {
-    language: language,
-    setLanguage: setLanguage,
+    lang: lang,
+    setLang: setLang,
     isActiveModalNavbar: isActiveModalNavbar,
     setIsActiveModalNavbar: setIsActiveModalNavbar,
     isActivePage: setIsActivePage,

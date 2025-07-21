@@ -8,7 +8,6 @@ import { QRCodeCanvas } from "qrcode.react";
 import { t } from "../constants/translation";
 import Footer from "./Footer";
 import { useGlobalState } from "./context/AppProvider";
-
 // Assets
 import purchaseImg from "../assets/purchase.png";
 import buyImg from "../assets/buy.png";
@@ -50,7 +49,7 @@ const actionCards = [
 ];
 
 const Home = () => {
-  const { language } = useGlobalState();
+
   const [userCode, setUserCode] = useState(null);
   const [url, setUrl] = useState(null);
   const [errMsg, setErrMsg] = useState("");
@@ -67,11 +66,13 @@ const Home = () => {
   useEffect(() => {
     userCode && setUrl(`${window.location.origin}/map?producerCode=${userCode}`);
   }, [userCode]);
-
+  const { lang, setLang } = useGlobalState();
   const genNewCode = () => {
     const val = document.getElementById("qr-id-input")?.value?.trim();
     val && setUserCode(val);
   };
+
+  console.log(lang);
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -80,7 +81,7 @@ const Home = () => {
       dispatch(logout());
       navigate("/");
     } catch (err) {
-      setErrMsg(err?.data?.message || t(language, 'errors.logoutFailed'));
+      setErrMsg(err?.data?.message || t(lang, 'errors.logoutFailed'));
     }
   };
 
@@ -114,7 +115,7 @@ const Home = () => {
         className="text-4xl md:text-6xl font-extrabold tracking-widest uppercase drop-shadow-2xl"
         style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.7)" }}
       >
-        {t(language, 'appName')}
+        {t(lang, 'appName')}
       </motion.h1>
     </header>
   );
@@ -128,12 +129,12 @@ const Home = () => {
         className="text-4xl font-bold mb-3 text-[#D9C4B2]"
         style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.5)" }}
       >
-        {t(language, 'welcome.title')}, <span className="font-extrabold text-teal-900">
-          {t(language, 'welcome.subtitle')}
+        {t(lang, 'welcome.title')}, <span className="font-extrabold text-teal-900">
+          {t(lang, 'welcome.subtitle')}
         </span>
       </motion.h2>
       <p className="text-blue-900 text-lg leading-relaxed tracking-wide max-w-xl mx-auto">
-        {t(language, 'welcome.description')}
+        {t(lang, 'welcome.description')}
       </p>
     </section>
   );
@@ -149,21 +150,21 @@ const Home = () => {
         >
           <img
             src={img}
-            alt={t(language, `actions.${key}.alt`)}
+            alt={t(lang, `actions.${key}.alt`)}
             className="w-20 h-24 mb-5 filter brightness-90"
             draggable={false}
           />
           <h3 className="text-2xl font-semibold mb-3">
-            {t(language, `actions.${key}.title`)}
+            {t(lang, `actions.${key}.title`)}
           </h3>
           <p className="text-[#D9C4B2] mb-6 text-sm max-w-[260px]">
-            {t(language, `actions.${key}.description`)}
+            {t(lang, `actions.${key}.description`)}
           </p>
           <Link
             to={to}
             className="bg-[#4B2E20] text-white px-6 py-2 rounded-full font-semibold tracking-wide shadow-md hover:bg-[#3a2418] transition-colors duration-300"
           >
-            {t(language, 'actions.learnMore')}
+            {t(lang, 'actions.learnMore')}
           </Link>
         </motion.div>
       ))}
@@ -173,14 +174,14 @@ const Home = () => {
   const renderQRGenerator = () => (
     <section className="bg-[#6A4227] rounded-xl p-10 shadow-lg max-w-xl mx-auto mb-20">
       <h3 className="text-white text-3xl font-semibold mb-8 text-center tracking-wide drop-shadow-lg">
-        {t(language, 'qrCode.title')}
+        {t(lang, 'qrCode.title')}
       </h3>
 
       <div className="flex flex-col md:flex-row gap-5 justify-center items-center mb-8">
         <input
           id="qr-id-input"
           type="text"
-          placeholder={t(language, 'qrCode.placeholder')}
+          placeholder={t(lang, 'qrCode.placeholder')}
           className="border border-[#D9C4B2] rounded-md px-4 py-3 text-[#F4EFEA] bg-transparent placeholder-[#D9C4B2] focus:outline-none focus:ring-2 focus:ring-[#D9C4B2] w-full md:w-auto transition-colors"
         />
         <motion.button
@@ -188,7 +189,7 @@ const Home = () => {
           onClick={genNewCode}
           className="bg-[#4B2E20] text-white px-8 py-3 rounded-full font-semibold tracking-wide shadow-md hover:bg-[#3a2418] transition-colors duration-300 whitespace-nowrap"
         >
-          {t(language, 'qrCode.generate')}
+          {t(lang, 'qrCode.generate')}
         </motion.button>
       </div>
 
@@ -204,7 +205,7 @@ const Home = () => {
           whileTap={{ scale: 0.95 }}
           onClick={handleDownload}
           className="mt-8 bg-[#4B2E20] text-white px-7 py-3 rounded-full hover:bg-[#3a2418] transition-colors duration-300 flex items-center gap-3 shadow-md"
-          aria-label={t(language, 'qrCode.saveButton')}
+          aria-label={t(lang, 'qrCode.saveButton')}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -220,7 +221,7 @@ const Home = () => {
               d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"
             />
           </svg>
-          {t(language, 'qrCode.saveButton')}
+          {t(lang, 'qrCode.saveButton')}
         </motion.button>
       </div>
     </section>
@@ -235,7 +236,7 @@ const Home = () => {
         to="/login"
         className="text-8xl font-extrabold tracking-wide text-[#D9C4B2] hover:text-white transition-colors cursor-pointer select-none"
       >
-        {t(language, 'login')}
+        {t(lang, 'login')}
       </motion.Link>
     </div>
   );
@@ -256,7 +257,7 @@ const Home = () => {
         )}
       </main>
 
-      <Footer userCode={userCode} url={url} language={language} />
+      <Footer userCode={userCode} url={url} language={lang} />
     </div>
   );
 };

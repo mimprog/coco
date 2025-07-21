@@ -132,7 +132,7 @@ const searchPlot = async (e, query) => {
 
         <Link
           to={`${ADMIN_ADD_PLOT}`}
-          className="ml-auto p-2 border shadow rounded-lg bg-blue-100 hover:bg-blue-300 hover:translate-y-1 transition"
+          className="ml-auto p-2 border shadow rounded-lg bg-amber-800 text-white hover:bg-amber-500 hover:translate-y-1 transition"
         >
           Ajouter plot
         </Link>

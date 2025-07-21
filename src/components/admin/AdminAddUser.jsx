@@ -53,18 +53,24 @@ const AdminAddUser = () => {
           code,
         }).unwrap();
         setSuccess(true);
+
         navigate("/admin/user");
+
       } catch (error) {
         setSuccess(false);
         setErrMessage(error?.data?.message || "Unexpected error");
+        setTimeout(() => {
+          setSuccess(false)
+          setErrMessage(false);
+        }, [3000])
       }
     }
   };
 
   return (
-    <section className="relative mt-20 text-gray-800">
-      <div className="text-center mx-auto w-fit bg-yellow-300 py-3 px-5 rounded-xl shadow-lg animate-fade-in">
-        <h1 className="text-lg md:text-xl font-extrabold text-yellow-900">Admin: Add User</h1>
+    <section className="relative text-gray-800">
+      <div className="text-center mx-20 text-amber-700 p-2 rounded-xl shadow-lg animate-fade-in">
+        <h1 className="text-lg md:text-xl font-extrabold">Admin: Add User</h1>
       </div>
 
       {(success || errMessage) && (

@@ -14,7 +14,7 @@ const Navbar = () => {
   const [errMsg, setErrMsg] = useState("");
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const location = useLocation();
-  const { isActiveModalNavbar, setIsActiveModalNavbar, language, setLanguage } = useGlobalState();
+  const { isActiveModalNavbar, setIsActiveModalNavbar, lang:language, setLang:setLanguage } = useGlobalState();
   const [logOutApiCall] = useLogoutMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,29 +23,34 @@ const Navbar = () => {
   const availableLanguages = Object.keys(translations);
   console.log(availableLanguages);
 
-  useEffect(() => {
-    // Load saved language preference
-    const savedLanguage = localStorage.getItem('appLanguage') || 'en';
-    setLanguage(savedLanguage);
+useEffect(() => {
+  // Load saved language preference
+  const savedLanguage = localStorage.getItem('appLanguage') || 'en';
+  setLanguage(savedLanguage);
 
-    const handleScroll = () => {
-      const header = document.getElementById("header");
-      if (!header) return;
-      
-      if (window.scrollY <= 0) {
-        header.style.backgroundColor = "transparent";
-        header.classList.remove("text-white");
-        header.classList.add("text-blue-600");
-      } else {
-        header.classList.add("text-white");
-        header.classList.remove("text-blue-600");
-        header.style.backgroundColor = "#4B2E20";
-      }
-    };
+  const handleScroll = () => {
+    const header = document.getElementById("header");
+    if (!header) return;
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (window.scrollY > 40) {
+      header.classList.add("text-amber-600");
+      header.classList.remove("text-purple-400");
+      header.style.backgroundColor = "#4B2E20"; // Fully opaque brown
+    } else {
+      header.classList.remove("text-amber-600");
+      header.classList.add("text-purple-400");
+      header.style.backgroundColor = "#b66a00ff"; // Set to white or whatever non-transparent color you want at top
+    }
+  };
+
+  // Run once on mount to handle initial scroll position
+  handleScroll();
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
+
 
   useEffect(() => {
     const logoElement = document.getElementById("logo");
@@ -87,7 +92,7 @@ const Navbar = () => {
     <div className="fixed top-0 left-0 right-0 text-white font-bold font-mono z-[1100]">
       <nav
         id="header"
-        className="transition-all duration-300 md:py-1 bg-transparent relative md:flex-row md:justify-between flex items-center"
+        className="transition-all text-white duration-300 md:py-1 bg-transparent relative md:flex-row md:justify-between flex items-center"
       >
         <img
           src={logo}
@@ -153,14 +158,7 @@ const Navbar = () => {
             </button>
           )}
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden ml-2 p-2 rounded-lg hover:bg-[#3a2418] transition-colors"
-            onClick={handleModalNavbar}
-            aria-label="Toggle menu"
-          >
-            {showModal ? <FaX /> : <FaAlignJustify />}
-          </button>
+
         </div>
       </nav>
 

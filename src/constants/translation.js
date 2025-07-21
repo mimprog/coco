@@ -1,3 +1,5 @@
+import { useActionState } from "react";
+
 export const translations = {
   en: {
     // Language selection
@@ -155,7 +157,70 @@ export const translations = {
     // Errors
     errors: {
       logoutFailed: "Logout failed"
-    }
+    },
+
+    // Administration
+    addplot: "Add Plot",
+    searchByName: "Search By Name",
+    name: "Name",
+    addCooperative: "Add Cooperative",
+    edit: "Edit",
+    users: "Users",
+    plots: "Plots",
+    cooperatives: "Cooperatives",
+    exporters: "Exporters",
+    addUser: "Add User",
+    userM: "User Management Dashboard",
+    searchUserMode: "Search by code / phone / email / name",
+    search: "Search",
+    phone: "Phone",
+    username: "Username",
+    email: "Email",
+    code: "Code",
+    delete: "Delete",
+
+    // Admin Sale / Purchase
+    admin: {
+      sale: {
+        title: "Sales",
+        add: "Add Sale",
+        edit: "Edit Sale",
+        quantity: "Quantity (kg)",
+        price: "Price (FCFA/kg)",
+        date: "Date of Sale",
+        code: "Producer Code",
+        cooperative: "Cooperative",
+        buyer: "Buyer",
+        submit: "Submit Sale",
+        confirmDelete: "Are you sure you want to delete this sale?",
+        deleteSuccess: "Sale deleted successfully",
+        editSuccess: "Sale updated successfully",
+        addSuccess: "Sale created successfully",
+      },
+      purchase: {
+        title: "Purchases",
+        add: "Add Purchase",
+        edit: "Edit Purchase",
+        quantity: "Quantity (kg)",
+        price: "Price (FCFA/kg)",
+        date: "Date of Purchase",
+        exporter: "Exporter",
+        seller: "Seller (Cooperative)",
+        submit: "Submit Purchase",
+        confirmDelete: "Are you sure you want to delete this purchase?",
+        deleteSuccess: "Purchase deleted successfully",
+        editSuccess: "Purchase updated successfully",
+        addSuccess: "Purchase created successfully",
+      },
+      table: {
+        action: "Action",
+        edit: "Edit",
+        delete: "Delete",
+        view: "View",
+        total: "Total",
+        noData: "No data available",
+      }
+    },
   },
   fr: {
     // Language selection
@@ -191,11 +256,11 @@ export const translations = {
       region: "Région"
     },
     searchButton: "Rechercher",
-    resetFilters: "Réinitialiser",
-    showFilters: "Afficher Filtres",
-    hideFilters: "Masquer Filtres",
+    resetFilters: "Réinitialiser les Filtres",
+    showFilters: "Afficher les Filtres",
+    hideFilters: "Masquer les Filtres",
     filterPlaceholder: "Filtrer par {field}",
-    noResults: "Aucun résultat correspond à vos critères.",
+    noResults: "Aucun résultat ne correspond à vos critères.",
     loadError: "Échec du chargement des données GeoJSON",
     legendTitle: "Légende",
     legendItems: {
@@ -204,7 +269,7 @@ export const translations = {
     },
     downloadPDF: "Télécharger PDF",
     summaryTitle: "Résumé",
-    showLegend: "Afficher Légende",
+    showLegend: "Afficher la Légende",
     
     // Home component
     welcome: {
@@ -277,7 +342,7 @@ export const translations = {
       plantnumbe: "Nombre d'Arbres",
       output: "Productivité",
       fertilizer: "Engrais Utilisé",
-      nberfertil: "Nombre de Fertilizations",
+      nberfertil: "Nombre de Fertilisations",
       insecticid: "Insecticide Utilisé",
       nberinsect: "Nombre de Traitements Insecticides",
       problems: "Problèmes Rencontrés",
@@ -313,7 +378,70 @@ export const translations = {
     // Errors
     errors: {
       logoutFailed: "Échec de la déconnexion"
-    }
+    },
+
+    // Administration
+    addplot: "Ajouter une Parcelle",
+    searchByName: "Rechercher par Nom",
+    name: "Nom",
+    addCooperative: "Ajouter une Coopérative",
+    edit: "Modifier",
+    users: "Utilisateurs",
+    plots: "Parcelles",
+    cooperatives: "Coopératives",
+    exporters: "Exportateurs",
+    addUser: "Ajouter un Utilisateur",
+    userM: "Tableau de Bord de Gestion des Utilisateurs",
+    searchUserMode: "Rechercher par code / téléphone / email / nom",
+    search: "Rechercher",
+    phone: "Téléphone",
+    username: "Nom d'utilisateur",
+    email: "Email",
+    code: "Code",
+    delete: "Supprimer",
+
+    // Admin Sale / Purchase
+    admin: {
+      sale: {
+        title: "Ventes",
+        add: "Ajouter une Vente",
+        edit: "Modifier la Vente",
+        quantity: "Quantité (kg)",
+        price: "Prix (FCFA/kg)",
+        date: "Date de Vente",
+        code: "Code Producteur",
+        cooperative: "Coopérative",
+        buyer: "Acheteur",
+        submit: "Soumettre la Vente",
+        confirmDelete: "Êtes-vous sûr de vouloir supprimer cette vente ?",
+        deleteSuccess: "Vente supprimée avec succès",
+        editSuccess: "Vente mise à jour avec succès",
+        addSuccess: "Vente créée avec succès",
+      },
+      purchase: {
+        title: "Achats",
+        add: "Ajouter un Achat",
+        edit: "Modifier l'Achat",
+        quantity: "Quantité (kg)",
+        price: "Prix (FCFA/kg)",
+        date: "Date d'Achat",
+        exporter: "Exportateur",
+        seller: "Vendeur (Coopérative)",
+        submit: "Soumettre l'Achat",
+        confirmDelete: "Êtes-vous sûr de vouloir supprimer cet achat ?",
+        deleteSuccess: "Achat supprimé avec succès",
+        editSuccess: "Achat mis à jour avec succès",
+        addSuccess: "Achat créé avec succès",
+      },
+      table: {
+        action: "Action",
+        edit: "Modifier",
+        delete: "Supprimer",
+        view: "Voir",
+        total: "Total",
+        noData: "Aucune donnée disponible",
+      }
+    },
   }
 };
 

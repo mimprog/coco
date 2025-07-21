@@ -61,7 +61,7 @@ const AdminUser = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 pt-28 font-sans text-stone-800">
+    <div className="container font-sans text-stone-800">
       <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl sm:text-3xl font-bold text-amber-800">User Management Dashboard</h1>
         <Link

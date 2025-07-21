@@ -59,9 +59,15 @@ function App() {
   return (
    
     <BrowserRouter basename="/">   
-      <Navbar/>
+
+      <div className=" ">
+        <Navbar/>
+      </div>
+
+      <div className="mt-24">
       <Routes>        
       {/**Public routes */}    
+      
         <Route path="/" element={<Home/>} />       
         <Route path="/map" element={<Map/>}/>
         <Route path="/assistance" element={<Assistance/>}/>
@@ -76,7 +82,9 @@ function App() {
         <Route path="/auth/error" element={<ErrorMiddleware/>}/>
         <Route path="/register" element={<Register />} />
         <Route path="/verifyEmailCode" element={<VerifyEmailCode/>}/>   
+        
       </Routes>
+      </div>
 
         <Routes>
           {/** RequireAuth routes */}

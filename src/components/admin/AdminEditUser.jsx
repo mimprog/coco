@@ -98,8 +98,8 @@ const AdminEditUser = () => {
   };
 
   return (
-    <section className="relative mt-20 text-yellow-900">
-      <div className="text-center mx-auto w-fit bg-yellow-300 py-3 px-5 rounded-xl shadow-lg animate-fade-in">
+    <section className="relative text-slate-800">
+      <div className="text-center mx-20  text-amber-700 p p-2 rounded-xl shadow-lg animate-fade-in">
         <h1 className="text-lg md:text-xl font-extrabold">Admin: Edit User</h1>
       </div>
 
@@ -181,7 +181,7 @@ const AdminEditUser = () => {
         {/* Submit */}
         <button
           disabled={!validEmail}
-          className="mt-4 w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-semibold rounded shadow-md transition duration-300"
+          className="mt-4 w-full py-2 bg-yellow-600 hover:bg-yellow-800 text-white font-semibold rounded shadow-md transition duration-300"
         >
           Save Changes
         </button>

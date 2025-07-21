@@ -25,8 +25,8 @@ const tileOptions = {
 
 const themeColors = {
   Light: "bg-white text-black",
-  Dark: "bg-gray-900 text-white",
-  Forest: "bg-green-900 text-green-100",
+  Dark: "bg-gray-900 text-teal-900",
+  Forest: "bg-green-900 text-green-900",
 };
 
 const teamColorMap = {
@@ -36,7 +36,7 @@ const teamColorMap = {
 
 const Map = () => {
   const [geojsonData, setGeojsonData] = useState(null);
-  const [errMsg, setErrMsg] = useState("");
+  const [errMsg, setErrMsg] = useSt("");
   const [tileType, setTileType] = useState("Satellite");
   const [theme, setTheme] = useState("Light");
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,7 +44,7 @@ const Map = () => {
   const [selectedData, setSelectedData] = useState(null);
   const [showLegend, setShowLegend] = useState(true);
   const [showFilterPanel, setShowFilterPanel] = useState(false);
-  const [userCode, setUserCode] = useState("");
+  const [userCode, setUserCode] = uateseState("");
   const [features, setFeatures] = useState([]);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
    const [limitGeojsonData, setLimitGeojsonData] = useState(null);

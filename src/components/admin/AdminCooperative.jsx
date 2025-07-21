@@ -67,14 +67,14 @@ const AdminCooperative = () => {
     <section className="w-[90vw] max-w-6xl mx-auto mt-24 px-2">
       <div className="bg-amber-100 p-4 rounded-lg shadow-md mb-4 text-center">
         <h1 className="text-2xl font-bold text-yellow-900">
-          {searchCooperatives ? "Résultat de la recherche" : "Gestion des Coopératives"}
+          {searchCooperatives ? "Search result" : "Admin Cooperative Dashboard"}
         </h1>
         {searchCooperatives && (
           <button
             className="mt-2 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
             onClick={() => setSearchCooperatives(null)}
           >
-            Voir toutes les coopératives
+            All Cooperatives
           </button>
         )}
       </div>
@@ -83,7 +83,7 @@ const AdminCooperative = () => {
         <div className="flex gap-2 flex-1">
           <input
             type="text"
-            placeholder="Rechercher par nom..."
+            placeholder="Search by name..."
             value={searchId}
             onChange={(e) => setSearchId(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch(e, searchId)}
@@ -93,14 +93,14 @@ const AdminCooperative = () => {
             onClick={(e) => handleSearch(e, searchId)}
             className="px-4 py-2 bg-yellow-700 text-white rounded hover:bg-yellow-800"
           >
-            Rechercher
+            Search
           </button>
         </div>
         <Link
           to={`${ADMIN_ADD_COOPERATIVE}`}
           className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 shadow"
         >
-          Ajouter une coopérative
+         Add a cooperative
         </Link>
       </div>
 
@@ -114,20 +114,20 @@ const AdminCooperative = () => {
             className="p-4 bg-amber-50 rounded-lg shadow border border-yellow-300"
           >
             <p className="text-lg font-medium text-yellow-900">
-              Nom: <span className="text-brown-700">{cooperative.name}</span>
+              Name: <span className="text-brown-700">{cooperative.name}</span>
             </p>
             <div className="mt-3 flex gap-2">
               <Link
                 to={`${ADMIN_EDIT_COOPERATIVE}?cooperativeId=${cooperative.id}`}
                 className="flex-1 text-center bg-green-500 text-white py-2 rounded hover:bg-green-600"
               >
-                Modifier
+                Edit
               </Link>
               <button
                 onClick={() => handleDelete(cooperative.id)}
                 className="flex-1 bg-red-500 text-white py-2 rounded hover:bg-red-600"
               >
-                Supprimer
+                Delete
               </button>
             </div>
           </li>
@@ -138,7 +138,7 @@ const AdminCooperative = () => {
       <table className="hidden md:table w-full mt-6 bg-amber-50 border rounded-lg overflow-hidden">
         <thead className="bg-yellow-200 text-yellow-900">
           <tr>
-            <th className="text-left py-3 px-4">Nom</th>
+            <th className="text-left py-3 px-4">Name</th>
             <th className="text-left py-3 px-4">Actions</th>
           </tr>
         </thead>
@@ -151,13 +151,13 @@ const AdminCooperative = () => {
                   to={`/admin/cooperative/edit?cooperativeId=${cooperative.id}`}
                   className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                 >
-                  Modifier
+                  Edit
                 </Link>
                 <button
                   onClick={() => handleDelete(cooperative.id)}
                   className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  Supprimer
+                  Delete
                 </button>
               </td>
             </tr>
